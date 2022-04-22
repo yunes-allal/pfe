@@ -27,7 +27,7 @@
 
 @section('content')
     <div class="container my-5">
-        <div class="text-end d-none d-md-block"><a class="btn btn-primary" href="{{ route('criteres.create') }}">Suivant</a></div>
+        <div class="text-center d-none d-md-block"><a class="btn btn-primary" href="{{ route('index') }}" data-bs-toggle="modal" data-bs-target="#validate">Terminer</a></div>
         <h3>Expression des besoins</h3>
         <p class="fs-5 text-muted mb-5">Toutes les besoins énoncées ci-dessous appartiennent au session de:
             <small class="fw-bold text-success">
@@ -105,8 +105,8 @@
                                                 Êtes-vous sûr de vouloir supprimer définitivement cet élément?
                                             </div>
                                             <div class="modal-footer border-top-0 mt-0">
-                                            <button type="button" class="btn btn-light rounded" data-bs-dismiss="modal">Annuler</button>
-                                            <button type="submit" class="btn btn-danger rounded">Supprimer</button>
+                                            <button type="button" class="btn btn-light  rounded" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-danger text-white rounded">Supprimer</button>
                                             </div>
                                         </div>
                                         </div>
@@ -137,7 +137,7 @@
             @if ($global_number < $session[0]->global_number)
                 <hr class="my-5 text-muted">
             @else
-                <div class="text-center"><a class="btn btn-primary" href="{{ route('criteres.create') }}" data-bs-toggle="modal" data-bs-target="#exampleModal">suivant</a></div>
+                <div class="text-center"><a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#validate">Terminer</a></div>
             @endif
             <h5 class="my-4">List des besoins <span class="fw-bold">{{ $global_number }}/{{ $session[0]->global_number }}</span></h5>
             <div>
@@ -192,7 +192,7 @@
                                             </div>
                                             <div class="modal-footer border-top-0 mt-0">
                                             <button type="button" class="btn btn-light rounded" data-bs-dismiss="modal">Annuler</button>
-                                            <button type="submit" class="btn btn-danger rounded">Supprimer</button>
+                                            <button type="submit" class="btn btn-danger text-white rounded">Supprimer</button>
                                             </div>
                                         </div>
                                         </div>
@@ -212,30 +212,15 @@
         </div>
 
 
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="validate" tabindex="-1" aria-labelledby="validateLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-muted mb-0 mt-2">
+                    confirmer
                 </div>
-                <div class="modal-body">
-                    <p>Session de:
-                        @php
-                            $session = DB::table('sessions')->where('on_going','=','true')
-                                            ->get();
-                            $session_name = Carbon\Carbon::parse($session[0]->name)->locale('fr_FR');
-                            print(Str::ucfirst($session_name->monthName).'  '.$session_name->year);
-                        @endphp
-                        , qui contient {{ $session[0]->global_number }} postes
-                    </p>
-                    <p>ouvre depuis: {{ date('d-m-Y', strtotime($session[0]->start_date)) }}</p>
-                    <p>jusqu'a: {{ date('d-m-Y', strtotime($session[0]->end_date)) }}</p>
-                    <p class="text-muted">apres cette etape tu peut pas changer les besoins</p>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                  <button type="button" class="btn btn-success">Valider</button>
+                <div class="modal-footer border-top-0 mt-0">
+                  <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                  <a href="{{ route('index') }}"><button type="button" class="btn btn-success text-white">Valider</button></a>
                 </div>
               </div>
             </div>
