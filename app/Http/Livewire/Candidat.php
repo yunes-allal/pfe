@@ -18,6 +18,7 @@ class Candidat extends Component
     public function render()
     {
         $candidats = User::search($this->search)
+                        ->where('type', '=', 'candidat')
                         ->orderBy($this->orderBy, $this->orderAsc? 'asc' : 'desc')
                         ->paginate($this->perPage);
         return view('livewire.candidat')->with('candidats', $candidats);

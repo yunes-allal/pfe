@@ -1,7 +1,9 @@
 <?php
 
+use App\Mail\Commission;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Models\Besoin;
 
 //TODO supprimiha
 Route::post('create-session',[App\Http\Controllers\SessionController::class, 'store'])->name('session');
@@ -18,16 +20,16 @@ Route::get('/', function (){return view('SDP.index');})->name('index');
 // Expression des besoins
 Route::get('session', [App\Http\Controllers\SessionController::class, 'index'])->name('session.index');
 Route::resource('besoins', 'App\Http\Controllers\BesoinController');
-//liste des candidats
 
+//liste des candidats
 Route::get('candidats', function(){
     return view('SDP.candidats');
 })->name('candidats');
 
 // Les commissions
-Route::get('commissions',function(){return view('SDP.commissions.index');});
-
-
+Route::get('commissions', [App\Http\Controllers\CommissionController::class, 'index'])->name('commission.index');
+Route::get('creer-commissions', [App\Http\Controllers\CommissionController::class, 'createCommissions'])->name('commission.create');
+Route::get('commissions-mails', [App\Http\Controllers\CommissionController::class, 'sendAccounts'])->name('commission.mail');
 
 
 

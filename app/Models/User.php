@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -45,9 +44,8 @@ class User extends Authenticatable
     ];
 
     public static function search($search){
-        return empty($search) ? static::query()->where('type','=','candidat')
-            : static::query()->where('type','=','candidat')
-                ->where('name','like','%'.$search.'%')
+        return empty($search) ? static::query()
+            : static::query()->where('name','like','%'.$search.'%')
                 ->orWhere('email','like','%'.$search.'%');
     }
 }

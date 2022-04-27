@@ -1,22 +1,39 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="coontainer">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active"data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-selected="true">Comformite</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Entretien</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">scientifique</button>
-            </li>
-          </ul>
-          <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">...</div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
-            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
-          </div>
+    <div class="container">
+        <h3>Affectation des commissions</h3>
+        <p class="">
+            dans cette étape, vous devez attribuer chaque compte au chef de departement correspondant
+        </p>
+        <div class="table responsive my-4">
+            <table class="table bordereless ">
+            <tbody>
+                <tr>
+                    <th>Nom de departement</th>
+                    <th>Email du destinataire</th>
+                    <th></th>
+                </tr>
+                @foreach ($commissions as $item)
+                <form action="{{ route('commission.mail') }}" action="POST">
+                    @csrf
+                    <tr>
+                        <td>{{ $item->name }}</td>
+                        <td>
+                            <input type="email" class="form-control" name="email" placeholder="exemple@email.com">
+                        </td>
+                        <input type="hidden" name="email_dep" value="{{ $item->email }}">
+                        <input type="hidden" name="password" value="{{ $item->password }}">
+                        <td>
+                            <button type="submit" class="btn btn-outline-primary">
+                                Envoyer
+                            </button>
+                        </td>
+                    </tr>
+                </form>
+                @endforeach
+            </tbody>
+            </table>
+        </div>
     </div>
 @endsection
