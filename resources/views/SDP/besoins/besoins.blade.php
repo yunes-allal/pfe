@@ -27,25 +27,26 @@
 
 @section('content')
     <div class="container my-5">
-        <div class="text-center d-none d-md-block"><a class="btn btn-primary" href="{{ route('index') }}" data-bs-toggle="modal" data-bs-target="#validate">Terminer</a></div>
+        @php
+            $session = DB::table('sessions')->select('name','global_number')
+                                    ->where('on_going','=','true')
+                                    ->get();
+        @endphp
+        @if ($global_number >= $session[0]->global_number)
+             <div class="text-end d-none d-md-block">
+                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#validate">Suivant</a>
+            </div>
+        @endif
+
         <h3>Expression des besoins</h3>
         <p class="fs-5 text-muted mb-5">Toutes les besoins énoncées ci-dessous appartiennent au session de:
             <small class="fw-bold text-success">
                 @php
-                    $session = DB::table('sessions')->select('name','global_number')
-                                    ->where('on_going','=','true')
-                                    ->get();
                     $session_name = Carbon\Carbon::parse($session[0]->name)->locale('fr_FR');
                     print(Str::ucfirst($session_name->monthName).'  '.$session_name->year);
                 @endphp
             </small>
         </p>
-        @if ($success = Session::get('success'))
-            <div class="alert alert-success w-50">{{ $success }}</div>
-        @endif
-        @if ($fail = Session::get('fail'))
-            <div class="alert alert-danger w-50">{{ $fail }}</div>
-        @endif
         <div class="row gx-5 gy-4 justify-content-center">
             @if ($global_number < $session[0]->global_number)
                 @livewire('besoin')
@@ -80,11 +81,11 @@
                                     print('Tous les specialites');
                                 }else{
                                     $speciality = getSpeciality($item->speciality_id);
-                                    $subspeciality = getSubspeciality($item->subspeciality_id);
-                                    if ($subspeciality) {
-                                    print($speciality[0]->name.' ( '.$subspeciality[0]->name.' )');
-                                    }else{
+                                    if (!$item->subspeciality_id) {
                                         print($speciality[0]->name);
+                                    }else{
+                                        $subspeciality = getSubspeciality($item->subspeciality_id);
+                                        print($speciality[0]->name.' ( '.$subspeciality[0]->name.' )');
                                     }
                                 }
                                 @endphp
@@ -94,19 +95,20 @@
                                 <form method="POST" action="{{ route('besoins.destroy', $item->id) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="btn btn-sm btn-outline-danger p-1" data-bs-toggle="modal" data-bs-target="#delete">
+                                    <button type="button" class="btn btn-sm btn-outline-danger p-1" data-bs-toggle="modal" data-bs-target="#delete{{ $item->id }}">
                                     <small>Supprimer</small>
                                     </button>
-                                    {{-- Modal --}}
-                                    <div class="modal fade" id="delete" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+
+                                    {{--! Modal --}}
+                                    <div class="modal fade" id="delete{{ $item->id }}" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-body text-muted mb-0 mt-2">
-                                                Êtes-vous sûr de vouloir supprimer définitivement cet élément?
+                                                Êtes-vous sûr de vouloir supprimer définitivement cet élément? {{ $item->speciality_id }}
                                             </div>
                                             <div class="modal-footer border-top-0 mt-0">
-                                            <button type="button" class="btn btn-light  rounded" data-bs-dismiss="modal">Annuler</button>
-                                            <button type="submit" class="btn btn-danger text-white rounded">Supprimer</button>
+                                            <button type="button" class="btn btn-light  rounded" data-bs-dismiss="modal">Non, annuler</button>
+                                            <button type="submit" class="btn btn-danger text-white rounded">Oui, supprimer</button>
                                             </div>
                                         </div>
                                         </div>
@@ -137,12 +139,14 @@
             @if ($global_number < $session[0]->global_number)
                 <hr class="my-5 text-muted">
             @else
-                <div class="text-center"><a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#validate">Terminer</a></div>
+                <div class="text-center">
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#validate">Suivant</a>
+                </div>
             @endif
             <h5 class="my-4">List des besoins <span class="fw-bold">{{ $global_number }}/{{ $session[0]->global_number }}</span></h5>
             <div>
                 @forelse ($besoins as $item)
-                    <div style="border-radius: 2rem;border-top-right-radius: 0rem" class="card mx-auto mb-4 shadow-sm w-75 p-3">
+                    <div style="border-radius: 1rem;border-top-right-radius: 0rem" class="card mx-auto mb-4 shadow-sm w-75 p-3">
                         <div class="card-body">
                             <h5 class="fw-bold">
                                 @php
@@ -157,11 +161,12 @@
                                                 print('Tous les specialites');
                                             }else{
                                                 $speciality = getSpeciality($item->speciality_id);
-                                                $subspeciality = getSubspeciality($item->subspeciality_id);
-                                                if ($subspeciality) {
-                                                print($speciality[0]->name.' - '.$subspeciality[0]->name);
-                                                }else{
+
+                                                if (!$item->subspeciality_id) {
                                                     print($speciality[0]->name);
+                                                }else{
+                                                    $subspeciality = getSubspeciality($item->subspeciality_id);
+                                                    print($speciality[0]->name.' - '.$subspeciality[0]->name);
                                                 }
                                             }
                                         @endphp
@@ -180,11 +185,11 @@
                                 <form method="POST" action="{{ route('besoins.destroy', $item->id) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="btn btn-sm btn-outline-danger p-1" data-bs-toggle="modal" data-bs-target="#delete-sm">
+                                    <button type="button" class="btn btn-sm btn-outline-danger p-1" data-bs-toggle="modal" data-bs-target="#delete-sm{{ $item->id }}">
                                     <small>Supprimer</small>
                                     </button>
-                                    {{-- Model --}}
-                                    <div class="modal fade" id="delete-sm" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+                                    {{--! Model --}}
+                                    <div class="modal fade" id="delete-sm{{ $item->id }}" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-body text-muted mb-0 mt-2">
@@ -216,11 +221,11 @@
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-body text-muted mb-0 mt-2">
-                    confirmer
+                    êtes-vous sûr de vouloir créer ces besoins?
                 </div>
                 <div class="modal-footer border-top-0 mt-0">
                   <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                  <a href="{{ route('commission.create') }}"><button type="button" class="btn btn-success text-white">Valider</button></a>
+                  <a href="{{ route('commission.create') }}"><button type="button" class="btn btn-success text-white">Oui, je suis sûr</button></a>
                 </div>
               </div>
             </div>

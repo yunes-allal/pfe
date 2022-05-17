@@ -99,5 +99,20 @@
             toastr.success("{{ Session::get('success') }}");
         </script>
     @endif
+    @if(Session::has('fail'))
+        <script>
+            toastr.options.closeButton = true;
+            toastr.options.progressBar = true;
+            toastr.options.positionClass = "toast-bottom-right"
+            toastr.error("{{ Session::get('fail') }}");
+        </script>
+    @endif
+    @if(Session::has('info'))
+        <script>
+            toastr.options.progressBar = true;
+            toastr.options.positionClass = "toast-bottom-right"
+            toastr.info("{{ Session::get('info') }}");
+        </script>
+    @endif
 </body>
 </html>

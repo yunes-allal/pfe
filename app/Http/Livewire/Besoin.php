@@ -9,6 +9,7 @@ use App\Models\Speciality;
 use App\Models\Subspeciality;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\PseudoTypes\True_;
 
 class Besoin extends Component
 {
@@ -68,16 +69,37 @@ class Besoin extends Component
 
         $global_positions = $session[0]->global_number;
         $positions = DB::table('besoins')->sum('positions_number');
+
         if($this->positions_number+$positions <= $global_positions){
-           \App\Models\Besoin::create([
-            'session_id'=> $session[0]->id,
-            'faculty_id'=> $this->selectedFaculty,
-            'department_id'=> $this->selectedDepartment,
-            'sector_id'=> $this->selectedSector,
-            'speciality_id'=> $this->selectedSpeciality,
-            'subspeciality_id'=> $this->selectedSubspeciality,
-            'positions_number'=> $this->positions_number
-        ]);
+            DB::table('besoins')->where('sector_id', '=', $this->selectedSector)
+                                ->where('speciality_id', '=', $this->selectedSpeciality)
+                                ->where('subspeciality_id', '=', $this->selectedSubspeciality)->first() ? $is_new = false : $is_new = true;
+            if($is_new){
+                if(!($this->selectedSpeciality && DB::table('besoins')->where('sector_id', '=', $this->selectedSector)->where('speciality_id', '=', NULL)->first())){
+
+                    if(!($this->selectedSubspeciality && DB::table('besoins')->where('speciality_id', '=', $this->selectedSpeciality)->where('subspeciality_id', '=', NULL)->first())){
+
+                        \App\Models\Besoin::create([
+                            'session_id'=> $session[0]->id,
+                            'faculty_id'=> $this->selectedFaculty,
+                            'department_id'=> $this->selectedDepartment,
+                            'sector_id'=> $this->selectedSector,
+                            'speciality_id'=> $this->selectedSpeciality,
+                            'subspeciality_id'=> $this->selectedSubspeciality,
+                            'positions_number'=> $this->positions_number
+                        ]);
+                    }else{
+                        return redirect()->route('besoins.index')->with('fail','Besoin existe deja! (inclus dans tous les sous-specialite)');
+                    }
+
+                }else{
+                    return redirect()->route('besoins.index')->with('fail','Besoin existe deja! (inclus dans tous les specialite)');
+                }
+
+            }else{
+                return redirect()->route('besoins.index')->with('fail','Besoin existe deja!');
+            }
+
         return redirect()->route('besoins.index')->with('success','Besoin ajoutée avec succès');
         }else{
             return redirect()->route('besoins.index')->with('fail','Vous avez déclaré plus de postes d\'emploi que le nombre total');

@@ -26,7 +26,7 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="mb-3">
                         <label for="date d'ouverture" class="form-label">Date d'ouverture <sup class="text-danger">*</sup></label>
-                        <input onchange="changeDate()" type="date" min="{{ Carbon\Carbon::now()->format('Y-m-d') }}" class="form-control" name="start_date" id="start_date">
+                        <input type="date" min="{{ Carbon\Carbon::now()->format('Y-m-d') }}" class="form-control" name="start_date" id="start_date">
                     </div>
                     <div class="mb-3">
                         <label for="date de cloture" class="form-label">Date de cloture <sup class="text-danger">*</sup></label>
@@ -55,15 +55,4 @@
         </form>
     </div>
 
-    <script>
-        function changeDate(){
-            let start_date = new Date(document.getElementById('start_date').value);
-            const end_date = new Date();
-
-            end_date.setDate(start_date.getDate() + 15);
-            //document.getElementById('end_date').setAttribute("min", end_date);
-            document.getElementById('end_date').value = end_date;
-            console.log(end_date);
-        }
-    </script>
 @endsection

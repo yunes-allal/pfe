@@ -28,32 +28,37 @@
               </select>
             </div>
         </form>
-        <div class="table-responsive">
-            <table class="table table-bordered caption-top">
+        <div class="table-responsive-md border p-4">
+            <table class="table table-borderless caption-top">
                 <caption>Page: {{ $candidats->currentPage() }}</caption>
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th class="text-center">ID</th>
                         <th>Nom et prenom</th>
                         <th>Specialite</th>
-                        <th>date d'inscription</th>
+                        <th class="text-center">date d'inscription</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($candidats as $item)
                         <tr>
-                            <td>{{ $item->id }}</td>
+                            <td class="text-center">{{ $item->id }}</td>
                             <td class="text-success fw-bold">{{ $item->name }}</td>
                             <td>{{ $item->email }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->created_at)->diffForHumans() }}</td>
+                            <td class="text-center">{{ \Carbon\Carbon::parse($item->created_at)->diffForHumans() }}</td>
                         </tr>
 
                     @empty
-
+                        <tr>
+                            <td class="text-center fw-bold text-muted" colspan="4">
+                                <img class="img-fluid w-25" src="{{ asset('assets/images/empty-box.png') }}" alt="empty box">
+                                <p>Aucun candidat ne correspond à votre recherche</p>
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
-            <div class="d-flex justify-content-center my-3">
+            <div class="d-flex justify-content-center my-4">
                 {!! $candidats->links('pagination::simple-bootstrap-5') !!}
             </div>
         </div>

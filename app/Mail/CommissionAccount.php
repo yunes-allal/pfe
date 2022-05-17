@@ -7,12 +7,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class Commission extends Mailable
+class CommissionAccount extends Mailable
 {
     use Queueable, SerializesModels;
-
     public $account;
-
     /**
      * Create a new message instance.
      *

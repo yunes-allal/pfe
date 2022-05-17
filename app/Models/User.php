@@ -44,8 +44,19 @@ class User extends Authenticatable
     ];
 
     public static function search($search){
-        return empty($search) ? static::query()
-            : static::query()->where('name','like','%'.$search.'%')
+        return empty($search) ? static::query()->where('type', '=', 'candidat')
+            : static::query()->where('type', '=', 'candidat')
+                ->where('name','like','%'.$search.'%')
                 ->orWhere('email','like','%'.$search.'%');
+    }
+
+    /**
+     * Get the user associated with the Dossier
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function dossier()
+    {
+        return $this->hasOne(Dossier::class);
     }
 }

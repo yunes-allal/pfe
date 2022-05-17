@@ -5,7 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Temp_dossier extends Model
+class Criteres extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name', 'name_ar', 'pts', 'type'
+    ];
 }

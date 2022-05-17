@@ -1,38 +1,39 @@
 <?php
 
-use App\Mail\Commission;
+use App\Http\Models\Besoin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Models\Besoin;
 
 //TODO supprimiha
 Route::post('create-session',[App\Http\Controllers\SessionController::class, 'store'])->name('session');
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', function (){return view('welcome');});
+Route::get('/accueil', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-
-//Route::get('besoins/delete',[App\Http\Controllers\BesoinController::class, 'destroy'])->name('besoins.destroy');
-Route::get('/', function (){return view('SDP.index');})->name('index');
 
 //! Sous directeur de personnel
 // Expression des besoins
-Route::get('session', [App\Http\Controllers\SessionController::class, 'index'])->name('session.index');
-Route::resource('besoins', 'App\Http\Controllers\BesoinController');
+    //? 1. session
+Route::get('session', [App\Http\Controllers\SessionController::class, 'index'])->name('session.index')->middleware('sdp');
+    //? 2. besoins
+Route::resource('besoins', 'App\Http\Controllers\BesoinController')->middleware('sdp');
+    //? 3. les criteres
+Route::resource('critères', 'App\Http\Controllers\CriteresController')->middleware('sdp');
+
 
 //liste des candidats
-Route::get('candidats', function(){
-    return view('SDP.candidats');
-})->name('candidats');
+Route::get('candidats', function(){return view('SDP.candidats');})->name('candidats')->middleware('sdp');
 
 // Les commissions
-Route::get('commissions', [App\Http\Controllers\CommissionController::class, 'index'])->name('commission.index');
-Route::get('creer-commissions', [App\Http\Controllers\CommissionController::class, 'createCommissions'])->name('commission.create');
-Route::get('commissions-mails', [App\Http\Controllers\CommissionController::class, 'sendAccounts'])->name('commission.mail');
+Route::get('commissions', [App\Http\Controllers\CommissionController::class, 'index'])->name('commission.index')->middleware('sdp');
+Route::get('créer-commissions', [App\Http\Controllers\CommissionController::class, 'createCommissions'])->name('commission.create')->middleware('sdp');
+Route::get('commissions-mails', [App\Http\Controllers\CommissionController::class, 'sendAccounts'])->name('commission.mail')->middleware('sdp');
 
 
-
-
-Route::resource('criteres', 'App\Http\Controllers\GlobalcriteriasController');
-
+//! Candidat
+Route::get('dossier', [App\Http\Controllers\DossierController::class, 'index'])->name('candidat.dossier')->middleware('candidat');
+Route::post('créer-dossier', [App\Http\Controllers\DossierController::class, 'create'])->name('candidat.create.dossier')->middleware('candidat');
+Route::post('mettre-à-jour-dossier', [App\Http\Controllers\DossierController::class, 'update'])->name('candidat.update.dossier')->middleware('candidat');
+Route::post('dossier/ajouter-experience-pro', [App\Http\Controllers\ExperienceProController::class, 'store'])->name('experience.store')->middleware('candidat');

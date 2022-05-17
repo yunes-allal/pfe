@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Temp_dossier;
+use App\Models\Criteres;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class TempDossierController extends Controller
+class CriteresController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,7 @@ class TempDossierController extends Controller
      */
     public function index()
     {
-        //
+        return view('SDP.besoins.criteres')->with('criteres', Criteres::all());
     }
 
     /**
@@ -41,10 +42,10 @@ class TempDossierController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Temp_dossier  $temp_dossier
+     * @param  \App\Models\Criteres  $criteres
      * @return \Illuminate\Http\Response
      */
-    public function show(Temp_dossier $temp_dossier)
+    public function show(Criteres $criteres)
     {
         //
     }
@@ -52,10 +53,10 @@ class TempDossierController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Temp_dossier  $temp_dossier
+     * @param  \App\Models\Criteres  $criteres
      * @return \Illuminate\Http\Response
      */
-    public function edit(Temp_dossier $temp_dossier)
+    public function edit(Criteres $criteres)
     {
         //
     }
@@ -64,21 +65,23 @@ class TempDossierController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Temp_dossier  $temp_dossier
+     * @param  \App\Models\Criteres  $criteres
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Temp_dossier $temp_dossier)
+    public function update(Request $request)
     {
-        //
+        DB::table('criteres')->where('id', '=', $request->id)
+                            ->update(['pts' => $request->pts]);
+        return back()->with('success', 'Critère modifié avec succès');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Temp_dossier  $temp_dossier
+     * @param  \App\Models\Criteres  $criteres
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Temp_dossier $temp_dossier)
+    public function destroy(Criteres $criteres)
     {
         //
     }
