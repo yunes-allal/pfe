@@ -1,52 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/app.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <title>Sass Test</title>
-</head>
-<body>
-    <!-- Navbar -->
+@php
+    $session = Illuminate\Support\Facades\DB::table('sessions')->latest()->first();
+@endphp
 
-    <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#"><img height="70" src="assets/img/logo.png" alt="Logo of Guelma university"></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-collapse">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item px-2"><a class="nav-link"href="">Accueil</a></li>
-                    <li class="nav-item px-2"><a class="nav-link"href="#articles">Articles</a></li>
-                    <li class="nav-item px-2"><a class="nav-link"href="guide">Guid</a></li>
-                    <li class="nav-item ps-2 pe-4"><a class="nav-link"href="#footer">à propos</a></li>
-                    <div class="vr"></div>
-                    <li class="nav-item ps-4 pe-2"><a class="nav-link link-dark" href="{{ route('login') }}">Se connecter</a></li>
-                </ul>
-                <a href="{{ route('register') }}"><button class="btn btn-outline-primary my-2">S'inscrire</button></a>
+@extends('layouts.app')
 
-          </div>
-        </div>
-      </nav>
-
+@section('content')
         <!-- BODY -->
-        <div style="height: 10rem"></div>
       <div class="container my-3">
-        <div class="row align-items-center">
+        <div class="row align-items-center" style="background-image: url({{ asset('assets/images/cool-background.svg') }})">
           <div class="col-md-6 col-sm-12">
-            <h1 class="display-3">This is our title</h1>
-            <h1 class="mt-2 lead lh-base">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corrupti soluta ad ut animi maiores commodi labore itaque ipsum assumenda, sapiente qui numquam dolores nesciunt voluptatibus quae, vero debitis. Perspiciatis, deserunt?</p>
+            <h1 class="display-5">Plateforme de recrutement pour l'université de 8 mai 1945 Guelma</h1>
+            <h1 class="mt-2 lead lh-base">Cette plateforme est destinée aux maître assistants de classe B</p>
             <div class="mt-4 mb-2 text-center">
-                <a href="{{ route('login') }}"><button class="mr-2 btn btn-primary">Se Connecter</button></a>
-
-              <button class="ml-2 btn btn-outline-secondary">En Savoir Plus</button>
+                @guest
+                   <a href="{{ route('login') }}"><button class="mr-2 btn btn-primary">Se Connecter</button></a>
+                @endguest
+                @auth
+                <a href="{{ route('home') }}"><button class="mr-2 btn btn-primary">Accueil</button></a>
+                @endauth
+                <button class="ml-2 btn btn-outline-secondary">En Savoir Plus</button>
             </div>
           </div>
           <div class="col">
-            <img class="img-responsive img-fluid" src="assets/img/undraw_organize_resume_re_k45b (2).svg" alt="">
+            <img class="img-responsive img-fluid" src="{{ asset('assets/images/Resume folder-amico.svg') }}">
           </div>
         </div>
 
@@ -55,74 +31,86 @@
 
 
         <section>
-          <div class="text-center">
-            <h6>Consultez notre</h6>
-            <div class="row">
-              <div class="col"><hr></div>
-              <div class="col-6"><h2>Dernières nouvelles et articles</h2></div>
-              <div class="col"><hr></div>
-            </div>
-            <i>Cliquez sur un titre d'actualité pour accéder à l'article</i>
-          </div>
-          <div class="row mt-5">
-            <div class="col-md-4">
-              <div class="card">
-                <div class="card-body">
-                  <span class="position-absolute top-0 start-100 translate-middle badge bg-warning">
-                    Nouveau
-                    <span class="visually-hidden">Latest</span>
-                  </span>
-                  <h6>De: <small class="fw-medium text-primary">10-09-2022</small></h6>
-                  <h6>à: <small class="fw-medium text-primary">20-09-2022</small></h6><br>
-                  <a href=""><h5 class="card-title text-truncate">Titre d'article</h5></a>
-                  <p class="card-text card-title text-truncate">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                  <p class="card-text"><small class="fw-light text-muted">10-03-2022</small></p>
+            <div class="row g-5 align-items-center">
+                <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 order-sm-1 order-2">
+                    <div class="text-center">
+                        <h6 class="text-muted">Consultez le dernier Concours de recrutement à</h6>
+                        <div class="row align-items-center">
+                        <div class="col"><hr></div>
+                        <div class="col-6"><h2>l'université de 8 mai 1945 Guelma</h2></div>
+                        <div class="col"><hr></div>
+                        </div>
+                        <i class="text-muted">Cliquez sur `plus` pour plus de details</i>
+                    </div>
                 </div>
-              </div>
+                <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+                    <div class="card p-4 shadow-sm" style="border-radius: 1rem; border-top-right-radius: 0rem">
+                        <div class="card-body">
+                            @if ($session->on_going=='true')
+                               <span class="position-absolute top-0 start-100 translate-middle p-2 bg-success border border-light rounded-circle"></span>
+                            @else
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                            @endif
+                          <h6>De: <small class="fw-bold text-primary">{{ date('d/m/Y', strtotime($session->start_date)) }}</small></h6>
+                          <h6>à: <small class="fw-bold text-danger">{{ date('d/m/Y', strtotime($session->end_date)) }}</small></h6><br>
+                          <h2 class="card-title text-truncate fw-bold">Avis de recrutement</h2>
+                          <p class="card-text card-title text-secondary">L'Université du 8 mai 1945 de Guelma lance un avis de recrutement extérne de <b class="text-info">{{ $session->global_number }}</b> maîtres assistants de classe `B` dans les spécialités suivantes..</p>
+                          <div class="text-end">
+                              <div class="btn btn-sm btn-info" data-bs-toggle='modal' data-bs-target='#AvisModal'>Plus</div>
+                          </div>
+
+                          <p class="card-text">
+                              <small class="fw-light text-muted">
+                                  @php
+                                    Carbon\Carbon::setLocale('fr');
+                                    $date = Carbon\Carbon::parse($session->created_at);
+                                  @endphp
+                                  {{ $date->diffForHumans() }}
+                              </small>
+                            </p>
+                        </div>
+                      </div>
+                </div>
             </div>
-          </div>
         </section>
 
         <div style="height: 8rem;"></div>
       </div>
 
-      <!-- footer -->
 
-      <footer class="footer-clean" style="text-align: center;"><img src="assets/img/logo.png" style="margin-top: 10px;margin-bottom: 20px;">
-        <div class="container" style="margin-top: 20px;">
-            <div class="row justify-content-center">
-                <div class="col-sm-4 col-md-3 item">
-                    <h3>Services</h3>
-                    <ul>
-                        <li><a href="#">Web design</a></li>
-                        <li><a href="#">Development</a></li>
-                        <li><a href="#">Hosting</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-4 col-md-3 item">
-                    <h3>About</h3>
-                    <ul>
-                        <li><a href="#">Company</a></li>
-                        <li><a href="#">Team</a></li>
-                        <li><a href="#">Legacy</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-4 col-md-3 item">
-                    <h3>Careers</h3>
-                    <ul>
-                        <li><a href="#">Job openings</a></li>
-                        <li><a href="#">Employee success</a></li>
-                        <li><a href="#">Benefits</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 item social"><a href="#"><i class="icon ion-social-facebook"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-snapchat"></i></a><a href="#"><i class="icon ion-social-instagram"></i></a>
-                    <p class="copyright">Company Name © 2022</p>
-                </div>
+    <div class="modal fade" id="AvisModal" tabindex="-1" aria-labelledby="AvisModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+            <div class="modal-body lh-lg">
+              <div class="text-center fs-6">
+                République Algérienne Démocratique et Populaire<br>Ministère de l'Enseignement Supérieur et de la Recherche Scientifique<br>Université 08 Mai 1945 Guelma
+              </div>
+              <div class="text-center fst-italic fs-3 text-decoration-underline fw-bold"><h2>Avis de recrutement</h2></div>
+              <p>L'université du 8 mai 1945 de Guelma lance un avis de recrutement extérne de {{ $session->global_number }} maîtres assistants de classe `B` dans les spécialités suivantes:</p>
+              <table class="table table-bordered">
+                  <tbody>
+                        <tr>
+                            <td>Lorem ipsum dolor sit.</td>
+                            <td>Unde, corporis similique. Libero.</td>
+                            <td>Optio impedit tenetur illum?</td>
+                        </tr>
+                  </tbody>
+
+              </table>
+              <div class="fs-6 fw-bold text-decoration-underline">Crières de sélection :</div>
+              <ul>
+                <li>Adéquation du profil de la formation du candidat avec les exigences du poste demandé ( 0 à 5 points ) .</li>
+                <li>La formation complémentaire au diplôme exigé dans la même spécialité ( 0 à 5 points ) .</li>
+                <li>Les travaux et études réalisés par le candidat dans sa spécialité ( 0 à 2 points ) .</li>
+                <li>L'expérience professionnelle acquise par le candidat ( 0 & 4 points ) .</li>
+                <li>Le résultat de l'entretien avec le jury de sélection ( 0 à 4 points ) .</li>
+              </ul>
+               NB : le départage des candidats déclarés ex - aquo ; s'effectue selon l'ordre de priorité suivant:
             </div>
+          </div>
         </div>
-    </footer>
-
-    <!-- js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-</body>
-</html>
+      </div>
+@endsection

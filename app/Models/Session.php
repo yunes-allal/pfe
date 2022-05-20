@@ -13,6 +13,9 @@ class Session extends Model
         'name', 'start_date', 'end_date', 'global_number', 'onlyDoctorat', 'decision', 'decision_date', 'agreement', 'agreement_date',
     ];
 
+    protected $dates = [
+        'start_date', 'end_date', 'created_at'
+    ];
     /**
      * Get all of the besoins for the Session
      *

@@ -5,24 +5,24 @@
         <div class="text-center">
             <h6 class="display-5">Bienvenu, {{ Auth::user()->name }}</h6>
         </div>
-        <div class="row gy-3 my-5 mx-3">
+        <div class="row g-4 justify-content-evenly m-5">
             @if (!App\Models\Dossier::where('user_id', Auth::id())->exists())
-            <a class="col-3 card rounded" data-bs-toggle="modal" data-bs-target="#submitModal">
+            <a class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-4 card shadow-sm rounded m-2" data-bs-toggle="modal" data-bs-target="#submitModal">
             @else
-            <a href="{{ route('candidat.dossier') }}" class="col-3 card rounded">
+            <a href="{{ route('candidat.dossier') }}" class="col-xs-12 col-sm-6 shadow-sm col-md-5 col-lg-4 col-xl-4 card rounded text-decoration-none m-2">
             @endif
                 <div class="card-body text-center">
-                    <ion-icon style="font-size:8rem" name="folder-open-outline"></ion-icon>
+                    <img src="{{ asset('assets/images/Personal files-bro.svg') }}" alt="folder-image">
                     <h3 class="display-6">Dossier</h3>
                 </div>
             </a>
-            <a href="" class="col-3 card rounded">
+            <a href="" class="colxs-12 col-sm-6 col-md-5 col-lg-4 col-xl-4 card shadow-sm rounded text-decoration-none m-2">
                 <div class="card-body text-center">
-                    <ion-icon style="font-size:8rem" name="mail-open-outline"></ion-icon>
+                    <img src="{{ asset('assets/images/Email capture-amico.svg') }}" alt="email-image">
                     <h3 class="display-6">Inbox</h3>
                 </div>
             </a>
-        </div>
+        </a>
 
 
 

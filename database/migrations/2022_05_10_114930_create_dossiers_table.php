@@ -17,6 +17,7 @@ return new class extends Migration
             // Folder informations
             $table->id();
             $table->string('status');
+            $table->string('current_tab')->default(1);
 
             //foreign IDs
             $table->foreignId('user_id')->constrained();

@@ -1,33 +1,29 @@
+@php
+    $current_tab = $dossier[0]->current_tab;
+@endphp
+
 @extends('layouts.app')
 
 @section('content')
     <div class="container">
-
         <form method="POST" action="{{ route('candidat.update.dossier') }}">
             @csrf
                 <div class="text-end my-3">
                     <button type="submit" class="btn btn-warning text-white">Mettre a jour</button>
                     <input type="hidden" name="id" value="{{ $dossier[0]->id }}">
+                    <input type="hidden" id="current_tab" name="current_tab" value="{{ $current_tab }}">
                 </div>
-
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item dropdown 	d-block d-md-none">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Les sections</a>
-                        <div class="dropdown-menu">
-                            <a class="nav-link dropdown-item" role="tab" data-bs-toggle="tab" href="#tab-1">Personnel</a>
-                            <a class="nav-link dropdown-item" role="tab" data-bs-toggle="tab" href="#tab-2">Formations</a>
-                            <a class="nav-link dropdown-item" role="tab" data-bs-toggle="tab" href="#tab-3">Experience</a>
-                        </div>
-                    </li>
-                    <li class="nav-item d-none d-md-block "  role="presentation"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#tab-1">Personnel</a></li>
-                    <li class="nav-item d-none d-md-block" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-2">Diplome</a></li>
-                    <li class="nav-item d-none d-md-block" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-3">Formations</a></li>
-                    <li class="nav-item d-none d-md-block" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-4">Experience</a></li>
-                    <li class="nav-item d-none d-md-block" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-5">Situation</a></li>
+                <ul id="tabs" class="nav nav-tabs fw-bold" role="tablist">
+                    <li onclick='changeTab(1)' class="nav-item"  role="presentation"><a class="nav-link" id="nav-link-1" role="tab" data-bs-toggle="tab" href="#tab-1" data-bs-toggle="tooltip" title="Personnel"><div class="d-block d-md-none">1</div><div class="d-none d-md-block">Personnel</div></a></li>
+                    <li onclick='changeTab(2)' class="nav-item" role="presentation"><a class="nav-link" id="nav-link-2" role="tab" data-bs-toggle="tab" href="#tab-2" data-bs-toggle="tooltip" title="Diplôme"><div class="d-block d-md-none">2</div><div class="d-none d-md-block">Diplôme</div></a></li>
+                    <li onclick='changeTab(3)' class="nav-item" role="presentation"><a class="nav-link" id="nav-link-3" role="tab" data-bs-toggle="tab" href="#tab-3" data-bs-toggle="tooltip" title="Formations"><div class="d-block d-md-none">3</div><div class="d-none d-md-block">Formations</div></a></li>
+                    <li onclick='changeTab(4)' class="nav-item" role="presentation"><a class="nav-link" id="nav-link-4" role="tab" data-bs-toggle="tab" href="#tab-4" data-bs-toggle="tooltip" title="Traveaux"><div class="d-block d-md-none">4</div><div class="d-none d-md-block">Traveaux</div></a></li>
+                    <li onclick='changeTab(5)' class="nav-item" role="presentation"><a class="nav-link" id="nav-link-5" role="tab" data-bs-toggle="tab" href="#tab-5" data-bs-toggle="tooltip" title="Expériences"><div class="d-block d-md-none">5</div><div class="d-none d-md-block">Expériences</div></a></li>
+                    <li onclick='changeTab(6)' class="nav-item" role="presentation"><a class="nav-link" id="nav-link-6" role="tab" data-bs-toggle="tab" href="#tab-6" data-bs-toggle="tooltip" title="Situation"><div class="d-block d-md-none">6</div><div class="d-none d-md-block">Situation</div></a></li>
                 </ul>
 
-                <div class="tab-content"></div>
-                    <div id="tab-1" class="tab-pane active" role="tabpanel">
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane" role="tabpanel">
                         <div class="card text-start">
                             <div class="card-body text-muted">
                             <!-- Section 1 - identity -->
@@ -341,85 +337,84 @@
                                 Vous pouvez ajouter votre formations complémentaires au diplôme exigé dans la même spécialité (le cas échéant)
                                 </p>
                                 <button type="button" class="btn btn-light text-primary border mx-3 my-4" data-bs-toggle="modal" data-bs-target="#ajouterFormation">
-                                <i data-feather="plus-circle"></i> Ajouter
-                            </button>
-                            </div>
-
-
-                            <!-- Modal -->
-                            <div class="modal fade" id="ajouterFormation" tabindex="-1" aria-labelledby="ajouterFormationLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Nouveau formation complémentaire</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                Ajouter</button>
+                                <div class="table-responsive">
+                                    <div class="text-muted">
+                                        Liste des formations complémentaires de {{ Auth::user()->name }}
                                     </div>
-                                    <div class="modal-body">
-                                    <div class="container px-3 py-3">
-                                        <div class="row gy-3">
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
-                                            <div class="mb-3">
-                                            <label for="nature de diplome" class="form-label">Nature du diplôme</label>
-                                            <input type="text" class="form-control" name="fc_diploma" id="fc_diploma">
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
-                                            <div class="mb-3">
-                                            <label for="filiere" class="form-label">Filière</label>
-                                            <input type="text" class="form-control" name="fc_field" id="fc_field">
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
-                                            <div class="mb-3">
-                                            <label for="specialite" class="form-label">Spécialité</label>
-                                            <input type="text" class="form-control" name="fc_major" id="fc_major">
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
-                                            <div class="mb-3">
-                                            <label for="etablissement d'origine" class="form-label">Établissement d'origine</label>
-                                            <input type="text" class="form-control" name="fc_origin" id="fc_origin" aria-describedby="hint1">
-                                            <small id="hint1" class="form-text text-muted">Institution ayant délivré le diplôme</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
-                                            <div class="mb-3">
-                                            <label for="numero de diplome" class="form-label">Numéro de diplôme</label>
-                                            <input type="text" class="form-control" name="fc_diploma_ref" id="fc_diploma_ref">
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
-                                            <div class="mb-3">
-                                            <label for="date de delivrance" class="form-label">Date de délivrance de diplôme</label>
-                                            <input type="date" class="form-control" name="fc_diploma_date" id="fc_diploma_date">
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 pb-2">
-                                            <div class="mb-3">
-                                            <label for="debut de formation" class="form-label">Debut de la formation</label>
-                                            <input type="date" class="form-control" name="fc_start_date" id="fc_start_date">
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 pb-2">
-                                            <div class="mb-3">
-                                            <label for="fin de formation" class="form-label">Fin de la formation</label>
-                                            <input type="date" class="form-control" name="fc_end_date" id="fc_end_date">
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 pb-2">
-                                            <div class="mb-3">
-                                            <label for="inscription de Phd" class="form-label">Inscription au doctorat</label>
-                                            <input type="date" class="form-control" name="fc_phd_register_date" id="fc_phd_register_date">
-                                            </div>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                                    <button type="button" class="btn btn-primary">Ajouter</button>
-                                    </div>
-                                </div>
+                                    <table class="table table-bordered text-center">
+                                        <tbody>
+                                            <tr>
+                                                <th>Nature de diplôme</th>
+                                                <th>filière</th>
+                                                <th>spécialité</th>
+                                                <th>établissement ayant délivré le diplôme</th>
+                                                <th>numéro de diplôme</th>
+                                                <th>date de délivrance de diplôme</th>
+                                                <th>durée de la formation</th>
+                                                <th>date d'obtention du diplome (d'inscription au doctorat)</th>
+                                                <th></th>
+                                            </tr>
+                                            @forelse (Illuminate\Support\Facades\DB::table('formations_comps')
+                                            ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                                <tr>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_diploma?print($item->fc_diploma):print('-');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_field?print($item->fc_field):print('-');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_major?print($item->fc_major):print('-');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_origin?print($item->fc_origin):print('-');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_diploma_ref?print($item->fc_diploma_ref):print('-');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_diploma_date?print(date('d/m/Y', strtotime($item->fc_diploma_date))):print('-');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_start_date?print(date('d/m/Y', strtotime($item->fc_start_date))."<br>"):print('');
+                                                        @endphp
+                                                        -
+                                                        @php
+                                                            $item->fc_end_date?print("<br>".date('d/m/Y', strtotime($item->fc_end_date))):print('');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $item->fc_phd_register_date?print(date('d/m/Y', strtotime($item->fc_phd_register_date))):print('-');
+                                                        @endphp
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn btn-outline-danger">Supprimer</div>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="8" class="text-center">
+                                                        Vous n'avez ajouté aucune formation complémentaire
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                             </div>
@@ -430,46 +425,218 @@
                             <div class="card-body text-muted">
                             <div class="container">
                                 <p class="fw-light fst-italic mx-5 my-4">
-                                Vous pouvez ajouter votre expériences professionnelle (le cas échéant)
+                                Vous pouvez ajouter ici les travaux ou études réalisés (le cas échéant)
                                 </p>
-
-                                <button type="button" class="btn btn-light text-primary border mx-3 my-4" data-bs-toggle="modal" data-bs-target="#ajouterExperience">
+                                <button type="button" class="btn btn-light text-primary border mx-3 my-4" data-bs-toggle="modal" data-bs-target="#ajouterTravail">
                                 Ajouter</button>
                             </div>
-
-                            <div class="mt-5">
-                                @forelse (Illuminate\Support\Facades\DB::table('experience_pros')
-                                            ->where('dossier_id', $dossier[0]->id)->get() as $item)
-                                    <table class="table">
-                                        <tbody class="text-muted">
-                                            <tr>
-                                                <th>Denomiation de l'administration ou de l'insitution (organisme d'emplyeur)</th>
-                                                <th style="max-width: 15vw">Fonction ou poste de travail occupe</th>
-                                                <th style="max-width: 20vw">Periode</th>
-                                                <th style="max-width: 15vw">attestation de travail ou contrat</th>
-                                                <th style="max-width: 15vw">motif de la rupture de la relation de travail</th>
-                                                <th style="max-width: 15vw">supprimer</th>
-                                            </tr>
-                                            <tr>
-                                                <td>{{ $item->ep_institution }}</td>
-                                                <td style="max-width: 15vw">{{ $item->ep_workplace }}</td>
-                                                <td>{{ date('d/m/Y', strtotime($item->ep_start_date)) }} - {{ date('d/m/Y', strtotime($item->ep_end_date)) }}</td>
-                                                <td style="max-width: 15vw">{{ $item->ep_work_certificate_ref }} <br> {{ date('d/m/Y', strtotime($item->ep_work_certificate_date)) }}</td>
-                                                <td style="max-width: 15vw">{{ $item->ep_mark }}</td>
-                                                <td style="max-width: 15vw"><div class="btn btn-danger">supprimer</div></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                @empty
-                                    <div class="mx-4 text-muted">Pas des experiences declarees</div>
-                                @endforelse
+                            <hr class="my-3">
+                            <div class="table-responsive">
+                                <div class="text-muted">
+                                    Liste des travaux ou études réalisés par {{ Auth::user()->name }}
+                                </div>
+                                <h3 class="text-muted mt-4">
+                                    Les revues
+                                </h3>
+                                <table class="table table-bordered text-center">
+                                    <tbody>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Titre</th>
+                                            <th>Revue</th>
+                                            <th>Date</th>
+                                            <th>Lien</th>
+                                            <th>URL</th>
+                                            <th width="10%"></th>
+                                        </tr>
+                                    </tbody>
+                                    @forelse (Illuminate\Support\Facades\DB::table('articles')
+                                    ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                        <tr>
+                                            <td>Revue
+                                                @php
+                                                    $item->is_international?print('internationale'):print('nationale');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->article_title?print($item->article_title):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->article?print($item->article):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->article_date?print(date('d/m/Y', strtotime($item->article_date))):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->article_place?print($item->article_place):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->article_link?print($item->article_link):print('-');
+                                                @endphp
+                                            </td>
+                                            <td><div class="btn btn-outline-danger">Supprimer</div></td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7">La liste des revues est vide</td>
+                                        </tr>
+                                    @endforelse
+                                </table>
+                                <h3 class="text-muted mt-4">
+                                    Les conférences
+                                </h3>
+                                <table class="table table-bordered text-center">
+                                    <tbody>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Nom de conférence</th>
+                                            <th>Lieu de conférence</th>
+                                            <th>Date de conférence</th>
+                                            <th>Titre de conférence</th>
+                                            <th>Auteurs de conférence</th>
+                                            <th>URL</th>
+                                            <th width="10%"></th>
+                                        </tr>
+                                    </tbody>
+                                    @forelse (Illuminate\Support\Facades\DB::table('conferences')
+                                    ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                        <tr>
+                                            <td>Conférence
+                                                @php
+                                                    $item->is_international?print('internationale'):print('nationale');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->conference_name?print($item->conference_name):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->conference_place?print($item->conference_place):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->conference_date?print(date('d/m/Y', strtotime($item->conference_date))):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->conference_title?print($item->conference_title):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->conference_authors?print($item->conference_authors):print('-');
+                                                @endphp
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $item->conference_link?print($item->conference_link):print('-');
+                                                @endphp
+                                            </td>
+                                            <td><div class="btn btn-outline-danger">Supprimer</div></td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8">La liste des conférences est vide</td>
+                                        </tr>
+                                    @endforelse
+                                </table>
                             </div>
-
                             </div>
                         </div>
 
                     </div>
                     <div id="tab-5" class="tab-pane" role="tabpanel">
+                        <div class="card text-start">
+                            <div class="card-body text-muted">
+                            <div class="container">
+                                <p class="fw-light fst-italic mx-5 my-4">
+                                Vous pouvez ajouter votre expériences professionnelle (le cas échéant)
+                                </p>
+                                <button type="button" class="btn btn-light text-primary border mx-3 my-4" data-bs-toggle="modal" data-bs-target="#ajouterExperience">
+                                Ajouter</button>
+                            </div>
+                            <div class="table-responsive">
+                                <div class="text-muted">
+                                    Liste des expériences professionnelle de {{ Auth::user()->name }}
+                                </div>
+                                <table class="table table-bordered text-center">
+                                    <tbody>
+                                        <tr>
+                                            <th>Denomiation de l'administration ou de l'insitution (organisme d'emplyeur)</th>
+                                                <th>Fonction ou poste de travail occupe</th>
+                                                <th>Periode</th>
+                                                <th>attestation de travail ou contrat</th>
+                                                <th style="max-width: 15vw">motif de la rupture de la relation de travail</th>
+                                                <th></th>
+                                        </tr>
+                                        @forelse (Illuminate\Support\Facades\DB::table('experience_pros')
+                                        ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                            <tr>
+                                                <td>
+                                                    @php
+                                                        $item->ep_institution?print($item->ep_institution):print('-');
+                                                    @endphp
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $item->ep_workplace?print($item->ep_workplace):print('-');
+                                                    @endphp
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $item->ep_start_date?print(date('d/m/Y', strtotime($item->ep_start_date))."<br>"):print('');
+                                                    @endphp
+                                                    -
+                                                    @php
+                                                        $item->ep_end_date?print("<br>".date('d/m/Y', strtotime($item->ep_end_date))):print('');
+                                                    @endphp
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $item->ep_work_certificate_ref?print($item->ep_work_certificate_ref."<br>"):print('');
+                                                    @endphp
+                                                    -
+                                                    @php
+                                                        $item->ep_work_certificate_date?print("<br>".date('d/m/Y', strtotime($item->ep_work_certificate_date))):print('');
+                                                    @endphp
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $item->ep_mark?print($item->ep_mark):print('-');
+                                                    @endphp
+                                                </td>
+                                                <td>
+                                                    <div class="btn btn-outline-danger">Supprimer</div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="8" class="text-center">
+                                                    Vous n'avez ajouté aucune formation complémentaire
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="tab-6" class="tab-pane" role="tabpanel">
                             <div class="card text-start">
                             <div class="card-body text-muted">
                                 <div class="row px-4 gy-3">
@@ -551,6 +718,268 @@
     </div>
 
         {{-- Modals --}}
+
+        {{-- Les formations complementaire --}}
+        <form action="{{ route('formation.store') }} " method="POST">
+            @csrf
+            <!-- Modal -->
+            <div class="modal fade" id="ajouterFormation" tabindex="-1" aria-labelledby="ajouterFormationLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Nouveau formation complémentaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    <div class="container px-3 py-3">
+                        <div class="row gy-3">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
+                            <div class="mb-3">
+                            <label for="nature de diplome" class="form-label">Nature du diplôme</label>
+                            <input type="text" class="form-control" name="fc_diploma" id="fc_diploma">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
+                            <div class="mb-3">
+                            <label for="filiere" class="form-label">Filière</label>
+                            <input type="text" class="form-control" name="fc_field" id="fc_field">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
+                            <div class="mb-3">
+                            <label for="specialite" class="form-label">Spécialité</label>
+                            <input type="text" class="form-control" name="fc_major" id="fc_major">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
+                            <div class="mb-3">
+                            <label for="etablissement d'origine" class="form-label">Établissement d'origine</label>
+                            <input type="text" class="form-control" name="fc_origin" id="fc_origin" aria-describedby="hint1">
+                            <small id="hint1" class="form-text text-muted">Institution ayant délivré le diplôme</small>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
+                            <div class="mb-3">
+                            <label for="numero de diplome" class="form-label">Numéro de diplôme</label>
+                            <input type="text" class="form-control" name="fc_diploma_ref" id="fc_diploma_ref">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 py-2">
+                            <div class="mb-3">
+                            <label for="date de delivrance" class="form-label">Date de délivrance de diplôme</label>
+                            <input type="date" class="form-control" name="fc_diploma_date" id="fc_diploma_date">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 pb-2">
+                            <div class="mb-3">
+                            <label for="debut de formation" class="form-label">Debut de la formation</label>
+                            <input type="date" class="form-control" name="fc_start_date" id="fc_start_date">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 pb-2">
+                            <div class="mb-3">
+                            <label for="fin de formation" class="form-label">Fin de la formation</label>
+                            <input type="date" class="form-control" name="fc_end_date" id="fc_end_date">
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 px-2 pb-2">
+                            <div class="mb-3">
+                            <label for="inscription de Phd" class="form-label">Inscription au doctorat</label>
+                            <input type="date" class="form-control" name="fc_phd_register_date" id="fc_phd_register_date">
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    <input type="hidden" name="dossier_id" value="{{ $dossier[0]->id }}">
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
+
+        {{-- Conference --}}
+        <form action="{{ route('conference.store') }} " method="POST">
+            @csrf
+            <!-- Modal -->
+            <div class="modal fade" id="ajouterConference" tabindex="-1" aria-labelledby="ajouterConferenceLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Nouvel conférence</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    <div class="container p-3">
+                        <div class="row g-3">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="filiere" class="form-label">Nature de conférence</label>
+                                  <select name="is_international" class="form-select">
+                                      <option disabled selected>Selectionner votre choix</option>
+                                      <option value="0">Conférence nationale</option>
+                                      <option value="1">Conférence internationale</option>
+                                  </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="filiere" class="form-label">Nom de conférence</label>
+                                  <input type="text" class="form-control" name="conference_name">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="filiere" class="form-label">Lieu de conférence</label>
+                                  <input type="text" class="form-control" name="conference_place">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="filiere" class="form-label">Date de conférence</label>
+                                  <input name="conference_date" type="date" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="filiere" class="form-label">Titre de conférence</label>
+                                  <input type="text" class="form-control" name="conference_title">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="filiere" class="form-label">Auteurs de conférence</label>
+                                  <input type="text" class="form-control" name="conference_authors">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="filiere" class="form-label">URL</label>
+                                  <input type="url" name="conference_link" class="form-control" placeholder="https://www.exemple.com">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <input type="hidden" name="dossier_id" value="{{ $dossier[0]->id }}">
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
+
+        {{-- Revue --}}
+        <form action="{{ route('revue.store') }} " method="POST">
+            @csrf
+            <!-- Modal -->
+            <div class="modal fade" id="ajouterRevue" tabindex="-1" aria-labelledby="ajouterRevueLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Nouvel Revue</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    <div class="container p-3">
+                        <div class="row g-3">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
+                                <div class="mb-3">
+                                  <label class="form-label">Nature de revue</label>
+                                  <select name="is_international" class="form-select">
+                                      <option value="0" selected>Revue nationale</option>
+                                      <option value="1">Revue internationale</option>
+                                  </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
+                                <div class="mb-3">
+                                  <label class="form-label">Titre</label>
+                                  <input type="text" class="form-control" name="article_title">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label class="form-label">Revue</label>
+                                  <input type="text" class="form-control" name="article">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label class="form-label">Date de revue</label>
+                                  <input type="date" class="form-control" name="article_date">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
+                                <div class="mb-3">
+                                  <label class="form-label">Lieu de revue</label>
+                                  <input type="text" class="form-control" name="article_place">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 px-2 py-2">
+                                <div class="mb-3">
+                                  <label class="form-label">URL</label>
+                                  <input type="url" name="article_link" class="form-control" placeholder="https://www.exemple.com">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <input type="hidden" name="dossier_id" value="{{ $dossier[0]->id }}">
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
+
+        {{-- Conference ou revue --}}
+
+        <div class="modal fade" id="ajouterTravail" tabindex="-1" aria-labelledby="ajouterTravailLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <div class="row g-4">
+                      <div data-bs-toggle="modal" data-bs-target="#ajouterRevue" class="col-6">
+                          <div class="card text-centered">
+                              <div class="card-body p-4">
+                                  <p>Icon</p>
+                                  <h4 class="text-muted">Revue</h4>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col">
+                        <div data-bs-toggle="modal" data-bs-target="#ajouterConference"  class="card">
+                            <div class="card-body p-4">
+                                <p>Icon</p>
+                                <h4 class="text-muted">Conference</h4>
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {{-- Les experiences professionnels --}}
         <form action="{{ route('experience.store') }}" method="POST">
             @csrf
           <!-- Modal -->
@@ -618,6 +1047,8 @@
           </div>
         </form>
 
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         if(document.getElementById("isMarried").value == "1"){
         document.getElementById("child_col").style.display = 'block';
@@ -667,5 +1098,12 @@
                 return false;
             return true;
         }
+
+        function changeTab(tab){
+            document.getElementById('current_tab').value = tab;
+        }
+        document.getElementById('tab-'+{{ $current_tab }}).classList.add('active');
+        document.getElementById('nav-link-'+{{ $current_tab }}).classList.add('active');
+        console.log({{ $current_tab }});
     </script>
 @endsection

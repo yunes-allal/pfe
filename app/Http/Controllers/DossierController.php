@@ -36,6 +36,7 @@ class DossierController extends Controller
     {
         DB::table('dossiers')->where('id',$request->id)
                             ->update([
+                                'current_tab' => $request->current_tab,
                                 'name'=>$request->name,
                                 'family_name' => $request->family_name,
                                 'name_ar'=>$request->name_ar,
