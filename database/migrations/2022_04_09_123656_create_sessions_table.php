@@ -19,12 +19,12 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->integer('global_number');
-            $table->string('onlyDoctorat');
-            $table->string('decision');
-            $table->date('decision_date');
-            $table->string('agreement');
-            $table->date('agreement_date');
-            $table->string('on_going')->default('true');
+            $table->boolean('onlyDoctorat');
+            $table->string('decision')->nullable();
+            $table->date('decision_date')->nullable();
+            $table->string('agreement')->nullable();
+            $table->date('agreement_date')->nullable();
+            $table->string('status')->default('declaring');
             $table->timestamps();
         });
     }

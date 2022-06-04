@@ -64,7 +64,7 @@ class Besoin extends Component
 
     public function store(){
         $session = DB::table('sessions')->select('id', 'global_number')
-                                    ->where('on_going','=','true')
+                                    ->where('status','=','declaring')
                                     ->get();
 
         $global_positions = $session[0]->global_number;
@@ -89,15 +89,15 @@ class Besoin extends Component
                             'positions_number'=> $this->positions_number
                         ]);
                     }else{
-                        return redirect()->route('besoins.index')->with('fail','Besoin existe deja! (inclus dans tous les sous-specialite)');
+                        return redirect()->route('besoins.index')->with('fail','Besoin existe déjà!');
                     }
 
                 }else{
-                    return redirect()->route('besoins.index')->with('fail','Besoin existe deja! (inclus dans tous les specialite)');
+                    return redirect()->route('besoins.index')->with('fail','Besoin existe déjà!');
                 }
 
             }else{
-                return redirect()->route('besoins.index')->with('fail','Besoin existe deja!');
+                return redirect()->route('besoins.index')->with('fail','Besoin existe déjà!');
             }
 
         return redirect()->route('besoins.index')->with('success','Besoin ajoutée avec succès');

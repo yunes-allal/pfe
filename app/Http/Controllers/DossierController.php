@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dossier;
+use App\Models\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,25 +18,29 @@ class DossierController extends Controller
         return view('candidat.dossier')->with('dossier', DB::table('dossiers')->where('user_id', Auth::id())->get());
     }
 
-    public function create(Request $request)
+    public function create()
     {
         if(!Dossier::where('user_id', Auth::id())->exists()){
+            $session = DB::table('sessions')->select('id')->where('status','!=', 'off')->get();
             Dossier::create([
+                'session_id' => $session[0]->id,
+                'current_tab' => 1,
                 'user_id'=> Auth::id(),
                 'status'=> 'not_validated',
-                'besoin_id' => $request->besoin_id,
                 'isMan' => 0,
                 'nationality' => 'Algerienne',
                 'isMarried' => 0
             ]);
+            return view('candidat.dossier')->with('success', 'Merci pour votre participation à notre programme');
         }
-        return view('candidat.dossier')->with('dossier', DB::table('dossiers')->where('user_id', Auth::id())->get());
+        return view('candidat.dossier');
     }
 
     public function update(Request $request)
     {
         DB::table('dossiers')->where('id',$request->id)
                             ->update([
+                                'besoin_id' => $request->besoin_id,
                                 'current_tab' => $request->current_tab,
                                 'name'=>$request->name,
                                 'family_name' => $request->family_name,
@@ -81,6 +86,6 @@ class DossierController extends Controller
                                 'sp_fax' => $request->sp_fax,
                                 'sp_email' => $request->sp_email,
                             ]);
-        return back()->with('info', 'updated successfuly');
+        return back()->with('info', 'Mis à jour avec succés');
     }
 }

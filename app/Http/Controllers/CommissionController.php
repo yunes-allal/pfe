@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\CommissionAccount;
 use App\Models\Commission;
+use App\Models\Note;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -68,7 +69,7 @@ class CommissionController extends Controller
                     'password' => $password,
                 ]);
         }
-        return redirect()->route('criteres.index')->with('success', 'Les commissions sont crees avec success');
+        return redirect()->route('critères.index')->with('success', 'Les commissions sont créés avec succès');
     }
 
     public function sendAccounts(Request $data)
@@ -80,5 +81,23 @@ class CommissionController extends Controller
 
         Mail::to($data->email)->send(new CommissionAccount($data));
         return redirect()->route('commission.index')->with('success', 'Email envoyee avec success');
+    }
+
+
+    public function getCandidates()
+    {
+        //return view('commission.conformite.candidates');
+        return view('commission.entretien.candidates');
+    }
+
+    public function conformed(Request $request)
+    {
+        DB::table('dossiers')->where('user_id', $request->user_id)->update(['is_conformed' => $request->decision]);
+        if($request->decision=="1"){
+            Note::create([
+                'dossier_id' => $request->dossier_id,
+            ]);
+        }
+        return redirect()->back();
     }
 }

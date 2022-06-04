@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('name_ar');
-            $table->float('pts', 3, 1);
+            $table->float('pts');
             $table->string('type');
             $table->timestamps();
         });

@@ -57,11 +57,12 @@
               @if (!is_null($selectedSector))
                 <div class="mb-3">
                   <label class="form-label">Nombre de postes <sup class="text-danger">*</sup></label>
-                  <input wire:model='positions_number' name="positions_number" type="number" min="1"  class="form-control">
+                  <input wire:model='positions_number' name="positions_number" type="number" min="1"
+                  class="form-control">
                 </div>
               @endif
               <div class="text-center">
-                  <button class="btn btn-success fw-bold" type="submit">Ajouter</button>
+                  <button class="btn btn-success fw-bold text-white" type="submit">Ajouter</button>
               </div>
         </form>
 </div>

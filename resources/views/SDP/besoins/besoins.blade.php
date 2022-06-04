@@ -29,7 +29,7 @@
     <div class="container my-5">
         @php
             $session = DB::table('sessions')->select('name','global_number')
-                                    ->where('on_going','=','true')
+                                    ->where('status','=','declaring')
                                     ->get();
         @endphp
         @if ($global_number >= $session[0]->global_number)
@@ -135,11 +135,11 @@
             </div>
         </div>
         {{-- display cards on small screens --}}
-        <div class="d-block d-md-none mt-5">
+        <div class="d-block d-md-none mt-3">
             @if ($global_number < $session[0]->global_number)
                 <hr class="my-5 text-muted">
             @else
-                <div class="text-center">
+                <div class="text-center mb-2">
                     <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#validate">Suivant</a>
                 </div>
             @endif
@@ -225,7 +225,7 @@
                 </div>
                 <div class="modal-footer border-top-0 mt-0">
                   <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                  <a href="{{ route('commission.create') }}"><button type="button" class="btn btn-success text-white">Oui, je suis sûr</button></a>
+                  <a href="{{ route('commission.create') }}"><button type="button" class="btn btn-outline-danger">Oui, je suis sûr</button></a>
                 </div>
               </div>
             </div>

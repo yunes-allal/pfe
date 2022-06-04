@@ -29,6 +29,10 @@ class HomeController extends Controller
         }else{
             if(Auth::user()->type == 'sdp'){
                 return view('SDP.index');
+            }else{
+                if(Auth::user()->type == 'commission'){
+                    return view('commission.conformite.index');
+                }
             }
         }
     }

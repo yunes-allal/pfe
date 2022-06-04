@@ -1,5 +1,28 @@
 @php
-    $current_tab = $dossier[0]->current_tab;
+    $dossier = Illuminate\Support\Facades\DB::table('dossiers')->where('user_id', Auth::id())->first();
+    $current_tab = $dossier->current_tab;
+
+    $besoins = Illuminate\Support\Facades\DB::table('besoins')->get();
+
+
+    function getFaculty($id)
+    {
+        return DB::table('faculties')->select('name', 'abbr')->where('id', $id)->first();
+    }
+
+    function getSector($id)
+    {
+        return DB::table('sectors')->select('name')->where('id', $id)->first();
+    }
+
+    function getSpeciality($id)
+    {
+        return DB::table('specialities')->select('name')->where('id', $id)->first();
+    }
+    function getSubspeciality($id)
+    {
+        return DB::table('subspecialities')->select('name')->where('id', $id)->first();
+    }
 @endphp
 
 @extends('layouts.app')
@@ -10,7 +33,7 @@
             @csrf
                 <div class="text-end my-3">
                     <button type="submit" class="btn btn-warning text-white">Mettre a jour</button>
-                    <input type="hidden" name="id" value="{{ $dossier[0]->id }}">
+                    <input type="hidden" name="id" value="{{ $dossier->id }}">
                     <input type="hidden" id="current_tab" name="current_tab" value="{{ $current_tab }}">
                 </div>
                 <ul id="tabs" class="nav nav-tabs fw-bold" role="tablist">
@@ -26,10 +49,49 @@
                     <div id="tab-1" class="tab-pane" role="tabpanel">
                         <div class="card text-start">
                             <div class="card-body text-muted">
+                                {{-- section 0 - application --}}
+                            <div class="py-3 pt-4">
+                                <small class="px-4 mt-5 text-dark fw-bold">Application</small>
+                                <div class="row px-4 mt-2">
+                                    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xl-8 px-2 py-2">
+                                        <div class="mb-3">
+                                            <label for="father name" class="form-label px-2">Application<sup class="text-danger"> *</sup></label>
+                                            <select name="besoin_id" class="form-select">
+
+                                                @foreach ($besoins as $item)
+                                                @php
+                                                    $faculty = getFaculty($item->faculty_id);
+                                                    $sector = getSector($item->sector_id);
+                                                    $speciality = 0;
+                                                    $subspeciality = 0;
+                                                    if($item->speciality_id){
+                                                        $speciality = getSpeciality($item->speciality_id);
+                                                    }
+                                                    if($item->subspeciality_id){
+                                                        $subspeciality = getSubspeciality($item->subspeciality_id);
+                                                    }
+                                                @endphp
+                                                    <option value="{{ $item->id }}" @if ($dossier->besoin_id == $item->id)
+                                                        selected
+                                                    @endif>
+                                                        <abbr title="{{ $faculty->name }}">{{ $faculty->abbr }}</abbr> - {{ $sector->name }}
+                                                        @if ($speciality)
+                                                            {{ ' - '.$speciality->name }}
+                                                        @endif
+                                                        @if ($subspeciality)
+                                                            {{ ' - '.$subspeciality->name }}
+                                                        @endif
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Section 1 - identity -->
                             <div class="py-3 pt-4">
                                 <small class="px-4 mt-5 text-dark fw-bold">Identité</small>
-                                <div class="row px-4 mt-2">
+                                <div class="row px-4">
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                     <label for="profilePicture" class="form-label px-2">Importer votre photo<sup class="text-danger"> *</sup></label>
@@ -41,25 +103,25 @@
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="name" class="form-label px-2">Nom<sup class="text-danger"> *</sup></label>
-                                        <input type="text" class="form-control" name="family_name" id="family_name" value="{{ $dossier[0]->family_name }}">
+                                        <input type="text" class="form-control" name="family_name" id="family_name" value="{{ $dossier->family_name }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="family name" class="form-label px-2">Prénom<sup class="text-danger"> *</sup></label>
-                                        <input type="text" class="form-control" name="name" id="name" value="{{ $dossier[0]->name }}">
+                                        <input type="text" class="form-control" name="name" id="name" value="{{ $dossier->name }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="arabic family name" class="form-label px-2">Nom en arabe<sup class="text-danger"> *</sup></label>
-                                        <input type="text" class="form-control text-end" name="family_name_ar" id="family_name_ar" placeholder="اللقب باللغة العربية" value="{{ $dossier[0]->family_name_ar }}">
+                                        <input type="text" class="form-control text-end" name="family_name_ar" id="family_name_ar" placeholder="اللقب باللغة العربية" value="{{ $dossier->family_name_ar }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="arabic name" class="form-label px-2">Prénom en arabe<sup class="text-danger"> *</sup></label>
-                                        <input type="text" class="form-control text-end" name="name_ar" id="name_ar" placeholder="الاسم باللغة العربية" value={{ $dossier[0]->name_ar }}>
+                                        <input type="text" class="form-control text-end" name="name_ar" id="name_ar" placeholder="الاسم باللغة العربية" value={{ $dossier->name_ar }}>
                                     </div>
                                 </div>
                             </div>
@@ -67,15 +129,15 @@
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="father name" class="form-label px-2">Prénom de pere<sup class="text-danger"> *</sup></label>
-                                        <input type="text" class="form-control" name="father_name" id="father_name" value="{{ $dossier[0]->father_name }}">
+                                        <input type="text" class="form-control" name="father_name" id="father_name" value="{{ $dossier->father_name }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="mother name" class="form-label px-2">Nom et prénom de mere<sup class="text-danger"> *</sup></label>
                                         <div class="input-group">
-                                        <input type="text" class="form-control" name="mother_family_name" id="mother_family_name" placeholder="nom" value="{{ $dossier[0]->mother_family_name }}">
-                                        <input type="text" class="form-control" name="mother_name" id="mother_name" placeholder="prénom" value="{{ $dossier[0]->mother_name }}">
+                                        <input type="text" class="form-control" name="mother_family_name" id="mother_family_name" placeholder="nom" value="{{ $dossier->mother_family_name }}">
+                                        <input type="text" class="form-control" name="mother_name" id="mother_name" placeholder="prénom" value="{{ $dossier->mother_name }}">
                                         </div>
                                     </div>
                                 </div>
@@ -84,28 +146,28 @@
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="date de naissance" class="form-label px-2">Date de naissance<sup class="text-danger"> *</sup></label>
-                                        <input type="date" max="{{ now()->subYears(20)->format('Y-m-d') }}" class="form-control text-muted" name="birth_date" id="birth_date" value="{{ $dossier[0]->birth_date }}">
+                                        <input type="date" max="{{ now()->subYears(20)->format('Y-m-d') }}" class="form-control text-muted" name="birth_date" id="birth_date" value="{{ $dossier->birth_date }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="lieu de naissance" class="form-label px-2">Lieu de naissance<sup class="text-danger"> *</sup></label>
-                                        <input type="text" class="form-control" name="birthplace" id="birthplace" value="{{ $dossier[0]->birthplace }}">
+                                        <input type="text" class="form-control" name="birthplace" id="birthplace" value="{{ $dossier->birthplace }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                     <label for="sexe" class="form-label px-2">Sexe<sup class="text-danger"> *</sup></label>
                                     <select class="form-select" name="isMan" id="isMan" onchange="displayNationalService()">
-                                        <option value="0" @if (!$dossier[0]->isMan) selected @endif >Femme</option>
-                                        <option value="1" @if ($dossier[0]->isMan) selected @endif>Homme</option>
+                                        <option value="0" @if (!$dossier->isMan) selected @endif >Femme</option>
+                                        <option value="1" @if ($dossier->isMan) selected @endif>Homme</option>
                                     </select>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="nationalite" class="form-label px-2">Nationalité<sup class="text-danger"> *</sup></label>
-                                        <input type="text" value="Algérienne" class="form-control text-muted" name="nationality" id="nationality" value="{{ $dossier[0]->nationality }}">
+                                        <input type="text" value="Algérienne" class="form-control text-muted" name="nationality" id="nationality" value="{{ $dossier->nationality }}">
                                     </div>
                                 </div>
                             </div>
@@ -113,7 +175,7 @@
                                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
                                     <label for="idCard" class="form-label px-2">Carte nationale<sup class="text-danger"> *</sup></label>
-                                    <input onkeypress="return onlyNumberKey(event)" type="text" class="form-control" maxlength="18" minlength="18" name="id_card" id="id_card" value="{{ $dossier[0]->id_card }}" placeholder="numéro de carte nationale">
+                                    <input onkeypress="return onlyNumberKey(event)" type="text" class="form-control" maxlength="18" minlength="18" name="id_card" id="id_card" value="{{ $dossier->id_card }}" placeholder="numéro de carte nationale">
                                 </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
@@ -132,21 +194,21 @@
                                         <div class="mb-3">
                                         <label for="situation familiale" class="form-label px-2">Situation familiale<sup class="text-danger"> *</sup></label>
                                             <select onchange="hasChildren()" class="form-select" name="isMarried" id="isMarried">
-                                            <option value="0" @if (!$dossier[0]->isMarried) selected @endif >Célibataire</option>
-                                            <option value="1" @if ($dossier[0]->isMarried) selected @endif>Marie(e)</option>
+                                            <option value="0" @if (!$dossier->isMarried) selected @endif >Célibataire</option>
+                                            <option value="1" @if ($dossier->isMarried) selected @endif>Marie(e)</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div style="display: none;" id="child_col" class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                         <div class="mb-3">
                                         <label for="nombre d'enfants" class="form-label px-2">Nombre d'enfants</label>
-                                        <input type="number" min="0" max="15" value="{{ $dossier[0]->children_number }}" class="form-control" name="children_number" id="children_number">
+                                        <input type="number" min="0" max="15" value="{{ $dossier->children_number }}" class="form-control" name="children_number" id="children_number">
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                         <div class="mb-3">
                                         <label for="besoins specifiques" class="form-label px-2">Besoins spécifiques</label>
-                                        <input type="text" class="form-control" name="disability_type" id="disability_type" placeholder="Nature de l'handicap" value="{{ $dossier[0]->disability_type }}">
+                                        <input type="text" class="form-control" name="disability_type" id="disability_type" placeholder="Nature de l'handicap" value="{{ $dossier->disability_type }}">
                                         </div>
                                     </div>
                                 </div>
@@ -159,15 +221,15 @@
                                     <div class="mb-3">
                                         <label for="lieu de residence" class="form-label px-2">Lieu de résidence<sup class="text-danger"> *</sup></label>
                                         <div class="input-group">
-                                        <input type="text" class="form-control" name="commune" id="commune" placeholder="commune" value="{{ $dossier[0]->commune }}">
-                                        <input type="text" class="form-control" name="wilaya" id="wilaya" placeholder="wilaya" value="{{ $dossier[0]->wilaya }}">
+                                        <input type="text" class="form-control" name="commune" id="commune" placeholder="commune" value="{{ $dossier->commune }}">
+                                        <input type="text" class="form-control" name="wilaya" id="wilaya" placeholder="wilaya" value="{{ $dossier->wilaya }}">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="inputCity" class="form-label px-2">Adresse<sup class="text-danger"> *</sup></label>
-                                        <input type="text" class="form-control" name="adresse" id="adresse" value="{{ $dossier[0]->adresse }}" placeholder="ex: Bat 1 Guelma , N 1">
+                                        <input type="text" class="form-control" name="adresse" id="adresse" value="{{ $dossier->adresse }}" placeholder="ex: Bat 1 Guelma , N 1">
                                     </div>
                                 </div>
                             </div>
@@ -179,13 +241,13 @@
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="phone" class="form-label px-2">Numéro de téléphone<sup class="text-danger"> *</sup></label>
-                                        <input type="tel" class="form-control" name="tel" id="tel" value="{{ $dossier[0]->tel }}" placeholder="ex: 07 77 77 77 77">
+                                        <input type="tel" class="form-control" name="tel" id="tel" value="{{ $dossier->tel }}" placeholder="ex: 07 77 77 77 77">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="email" class="form-label px-2">Email<sup class="text-danger"> *</sup></label>
-                                        <input type="email" class="form-control" name="email" id="email" value="{{ Auth::user()->email }}" placeholder="nom.prenom@exemple.com">
+                                        <input disabled type="email" class="form-control" name="email" id="email" value="{{ Auth::user()->email }}">
                                     </div>
                                 </div>
                             </div>
@@ -198,23 +260,23 @@
                                     <div class="mb-3">
                                         <label for="service national" class="form-label px-2">Service Nationale<sup class="text-danger"> *</sup></label>
                                             <select class="form-select" name="national_service" id="national_service">
-                                                <option value="accompli" @if($dossier[0]->national_service == 'accompli') selected @endif>Accomplie</option>
-                                                <option value="dispense" @if($dossier[0]->national_service == 'dispense') selected @endif>Exempté / Dispensé</option>
-                                                <option value="sursitaire" @if($dossier[0]->national_service == 'sursitaire') selected @endif>Sursitaire</option>
-                                                <option value="inscrit" @if($dossier[0]->national_service == 'inscrit') selected @endif>Inscrit</option>
+                                                <option value="accompli" @if($dossier->national_service == 'accompli') selected @endif>Accomplie</option>
+                                                <option value="dispense" @if($dossier->national_service == 'dispense') selected @endif>Exempté / Dispensé</option>
+                                                <option value="sursitaire" @if($dossier->national_service == 'sursitaire') selected @endif>Sursitaire</option>
+                                                <option value="inscrit" @if($dossier->national_service == 'inscrit') selected @endif>Inscrit</option>
                                             </select>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 px-2 py-2">
                                     <div class="mb-3">
                                     <label for="reference" class="form-label px-2">Référence</label>
-                                    <input type="text" class="form-control" name="doc_num" id="doc_num" placeholder="numéro de document" value="{{ $dossier[0]->doc_num }}">
+                                    <input type="text" class="form-control" name="doc_num" id="doc_num" placeholder="numéro de document" value="{{ $dossier->doc_num }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 px-2 py-2">
                                     <div class="mb-3">
                                     <label for="reference" class="form-label px-2">délivré le:</label>
-                                    <input type="date" max="{{ now()->format('Y-m-d') }}" class="form-control" name="doc_issued_date" id="doc_issued_date" value="{{ $dossier[0]->doc_issued_date }}">
+                                    <input type="date" max="{{ now()->format('Y-m-d') }}" class="form-control" name="doc_issued_date" id="doc_issued_date" value="{{ $dossier->doc_issued_date }}">
                                     </div>
                                 </div>
                                 </div>
@@ -230,15 +292,15 @@
                                         <div class="mb-3">
                                             <label for="" class="form-label">Denomination du diplome</label>
                                             <select onchange="magisterDiploma()" id="diploma_name" class="form-select" name="diploma_name">
-                                            <option value="doctorat" @if($dossier[0]->diploma_name=="doctorat") selected @endif>Doctorat</option>
-                                            <option value="magister" @if($dossier[0]->diploma_name=="magister") selected @endif>Magister</option>
+                                            <option value="doctorat" @if($dossier->diploma_name=="doctorat") selected @endif>Doctorat</option>
+                                            <option value="magister" @if($dossier->diploma_name=="magister") selected @endif>Magister</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                         <div class="mb-3">
                                             <label for="" class="form-label">Mention</label>
-                                            <input type="text" class="form-control" name="diploma_mark" value="{{ $dossier[0]->diploma_mark }}">
+                                            <input type="text" class="form-control" name="diploma_mark" value="{{ $dossier->diploma_mark }}">
                                         </div>
                                     </div>
                                 </div>
@@ -246,13 +308,13 @@
                                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                     <div class="mb-3">
                                         <label for="" class="form-label">Filiere</label>
-                                        <input type="text" class="form-control" name="diploma_sector" value="{{ $dossier[0]->diploma_sector }}">
+                                        <input type="text" class="form-control" name="diploma_sector" value="{{ $dossier->diploma_sector }}">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                 <div class="mb-3">
                                     <label for="" class="form-label">Specialite</label>
-                                    <input type="text" class="form-control" name="diploma_speciality" value="{{ $dossier[0]->diploma_speciality }}">
+                                    <input type="text" class="form-control" name="diploma_speciality" value="{{ $dossier->diploma_speciality }}">
                                 </div>
                             </div>
                                 </div>
@@ -260,13 +322,13 @@
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                         <div class="mb-3">
                                             <label for="" class="form-label">Date d'obtention du diplome</label>
-                                            <input type="date" class="form-control" max="{{ now()->format('Y-m-d') }}" name="diploma_date" value="{{ $dossier[0]->diploma_date }}">
+                                            <input type="date" class="form-control" max="{{ now()->format('Y-m-d') }}" name="diploma_date" value="{{ $dossier->diploma_date }}">
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                     <div class="mb-3">
                                         <label for="" class="form-label">Numero</label>
-                                        <input type="text" class="form-control" name="diploma_number" value="{{ $dossier[0]->diploma_number }}">
+                                        <input type="text" class="form-control" name="diploma_number" value="{{ $dossier->diploma_number }}">
                                     </div>
                                     </div>
                                 </div>
@@ -275,15 +337,15 @@
                                         <label for="" class="form-label">Duree de la formation pour obtenu le diplome</label>
                                         <div class="input-group mb-3">
                                             <span class="input-group-text" id="basic-addon1">De</span>
-                                            <input type="date" class="form-control" name="diploma_start_date" value="{{ $dossier[0]->diploma_start_date }}">
+                                            <input type="date" class="form-control" name="diploma_start_date" value="{{ $dossier->diploma_start_date }}">
                                             <span class="input-group-text" id="basic-addon1">A</span>
-                                            <input type="date" class="form-control" name="diploma_end_date" value="{{ $dossier[0]->diploma_end_date }}">
+                                            <input type="date" class="form-control" name="diploma_end_date" value="{{ $dossier->diploma_end_date }}">
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                         <div class="mb-3">
                                             <label for="" class="form-label">Institution</label>
-                                            <input type="text" class="form-control" name="diploma_institution" value="{{ $dossier[0]->diploma_institution }}">
+                                            <input type="text" class="form-control" name="diploma_institution" value="{{ $dossier->diploma_institution }}">
                                         </div>
                                     </div>
                                 </div>
@@ -356,7 +418,7 @@
                                                 <th></th>
                                             </tr>
                                             @forelse (Illuminate\Support\Facades\DB::table('formations_comps')
-                                            ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                            ->where('dossier_id', $dossier->id)->get() as $item)
                                                 <tr>
                                                     <td>
                                                         @php
@@ -451,7 +513,7 @@
                                         </tr>
                                     </tbody>
                                     @forelse (Illuminate\Support\Facades\DB::table('articles')
-                                    ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                    ->where('dossier_id', $dossier->id)->get() as $item)
                                         <tr>
                                             <td>Revue
                                                 @php
@@ -508,7 +570,7 @@
                                         </tr>
                                     </tbody>
                                     @forelse (Illuminate\Support\Facades\DB::table('conferences')
-                                    ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                    ->where('dossier_id', $dossier->id)->get() as $item)
                                         <tr>
                                             <td>Conférence
                                                 @php
@@ -583,7 +645,7 @@
                                                 <th></th>
                                         </tr>
                                         @forelse (Illuminate\Support\Facades\DB::table('experience_pros')
-                                        ->where('dossier_id', $dossier[0]->id)->get() as $item)
+                                        ->where('dossier_id', $dossier->id)->get() as $item)
                                             <tr>
                                                 <td>
                                                     @php
@@ -643,70 +705,70 @@
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="denomination" class="form-label px-2">Dénomination de garde occupé</label>
-                                        <input type="text" class="form-control" name="sp_workplace" id="sp_workplace" value="{{ $dossier[0]->sp_workplace }}">
+                                        <input type="text" class="form-control" name="sp_workplace" id="sp_workplace" value="{{ $dossier->sp_workplace }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="date" class="form-label px-2">Date de la première nomination</label>
-                                        <input type="date" class="form-control" name="sp_first_nomination_date" id="sp_first_nomination_date" value="{{ $dossier[0]->sp_first_nomination_date }}">
+                                        <input type="date" class="form-control" name="sp_first_nomination_date" id="sp_first_nomination_date" value="{{ $dossier->sp_first_nomination_date }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="date" class="form-label px-2">Date de nomination de poste actuelle</label>
-                                        <input type="date" class="form-control" name="sp_nomination_date" id="sp_nomination_date" value="{{ $dossier[0]->sp_nomination_date }}">
+                                        <input type="date" class="form-control" name="sp_nomination_date" id="sp_nomination_date" value="{{ $dossier->sp_nomination_date }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="category" class="form-label px-2">Catégorie</label>
-                                        <input type="text" class="form-control" name="sp_category" id="sp_category" value="{{ $dossier[0]->sp_category }}">
+                                        <input type="text" class="form-control" name="sp_category" id="sp_category" value="{{ $dossier->sp_category }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="echelon" class="form-label px-2">Echelon</label>
-                                        <input type="text" class="form-control" name="sp_echelon" id="sp_echelon" value="{{ $dossier[0]->sp_echelon }}">
+                                        <input type="text" class="form-control" name="sp_echelon" id="sp_echelon" value="{{ $dossier->sp_echelon }}">
                                     </div>
                                     </div>
                                     <div class="col-12 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="category" class="form-label px-2">Référence de l'accord de l'organisme employeur pour la participation du candidat au concours</label>
                                         <div class="input-group">
-                                        <input type="text" class="form-control" name="sp_agreement_ref" id="sp_agreement_ref" placeholder="Numéro" value="{{ $dossier[0]->sp_agreement_ref }}">
-                                        <input type="date" class="form-control" name="sp_agreement_date" id="sp_agreement_date" value="{{ $dossier[0]->sp_agreement_date }}">
+                                        <input type="text" class="form-control" name="sp_agreement_ref" id="sp_agreement_ref" placeholder="Numéro" value="{{ $dossier->sp_agreement_ref }}">
+                                        <input type="date" class="form-control" name="sp_agreement_date" id="sp_agreement_date" value="{{ $dossier->sp_agreement_date }}">
                                         </div>
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 px-2 py-2">
                                     <div class="mb-3">
                                         <label class="form-label px-2">L'autorité ayant pouvoir de signature</label>
-                                        <input type="text" class="form-control" name="sp_authority" id="sp_authority" value="{{ $dossier[0]->sp_authority }}">
+                                        <input type="text" class="form-control" name="sp_authority" id="sp_authority" value="{{ $dossier->sp_authority }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="adresse" class="form-label px-2">Adresse de l'administration</label>
-                                        <input type="text" class="form-control" name="sp_adresse" id="sp_adresse" value="{{ $dossier[0]->sp_adresse }}">
+                                        <input type="text" class="form-control" name="sp_adresse" id="sp_adresse" value="{{ $dossier->sp_adresse }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="phone" class="form-label px-2">Tel</label>
-                                        <input type="tel" class="form-control" name="sp_tel" id="sp_tel" value="{{ $dossier[0]->sp_tel }}">
+                                        <input type="tel" class="form-control" name="sp_tel" id="sp_tel" value="{{ $dossier->sp_tel }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="phone" class="form-label px-2">Fax</label>
-                                        <input type="tel" class="form-control" name="sp_fax" id="sp_fax" value="{{ $dossier[0]->sp_fax }}">
+                                        <input type="tel" class="form-control" name="sp_fax" id="sp_fax" value="{{ $dossier->sp_fax }}">
                                     </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 px-2 py-2">
                                     <div class="mb-3">
                                         <label for="email" class="form-label px-2">Email</label>
-                                        <input type="email" class="form-control" name="sp_email" id="sp_email" placeholder="company@example.com" value="{{ $dossier[0]->sp_email }}">
+                                        <input type="email" class="form-control" name="sp_email" id="sp_email" placeholder="company@example.com" value="{{ $dossier->sp_email }}">
                                     </div>
                                     </div>
                                 </div>
@@ -791,7 +853,7 @@
                         </div>
                     </div>
                     </div>
-                    <input type="hidden" name="dossier_id" value="{{ $dossier[0]->id }}">
+                    <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
                     <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
                     <button type="submit" class="btn btn-primary">Ajouter</button>
@@ -870,7 +932,7 @@
                         </div>
                     </div>
                     </div>
-                    <input type="hidden" name="dossier_id" value="{{ $dossier[0]->id }}">
+                    <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
                     <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
                     <button type="submit" class="btn btn-primary">Ajouter</button>
@@ -940,7 +1002,7 @@
                         </div>
                     </div>
                     </div>
-                    <input type="hidden" name="dossier_id" value="{{ $dossier[0]->id }}">
+                    <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
                     <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
                     <button type="submit" class="btn btn-primary">Ajouter</button>
@@ -958,17 +1020,17 @@
                 <div class="modal-body">
                   <div class="row g-4">
                       <div data-bs-toggle="modal" data-bs-target="#ajouterRevue" class="col-6">
-                          <div class="card text-centered">
-                              <div class="card-body p-4">
-                                  <p>Icon</p>
+                          <div class="card shadow-sm">
+                              <div class="card-body p-4 text-center">
+                                  <img src="{{ asset('assets/images/Add files-amico.svg') }}" alt="">
                                   <h4 class="text-muted">Revue</h4>
                               </div>
                           </div>
                       </div>
                       <div class="col">
-                        <div data-bs-toggle="modal" data-bs-target="#ajouterConference"  class="card">
-                            <div class="card-body p-4">
-                                <p>Icon</p>
+                        <div data-bs-toggle="modal" data-bs-target="#ajouterConference"  class="card shadow-sm">
+                            <div class="card-body p-4 text-center">
+                                <img src="{{ asset('assets/images/Conference speaker-pana.svg') }}" alt="">
                                 <h4 class="text-muted">Conference</h4>
                             </div>
                         </div>
@@ -1037,7 +1099,7 @@
                     </div>
                   </div>
                 </div>
-                <input type="hidden" name="dossier_id" value="{{ $dossier[0]->id }}">
+                <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
                 <div class="modal-footer">
                   <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
                   <button type="submit" name="add_exp" class="btn btn-primary">Ajouter</button>
@@ -1104,6 +1166,5 @@
         }
         document.getElementById('tab-'+{{ $current_tab }}).classList.add('active');
         document.getElementById('nav-link-'+{{ $current_tab }}).classList.add('active');
-        console.log({{ $current_tab }});
     </script>
 @endsection

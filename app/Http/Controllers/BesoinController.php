@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Besoin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BesoinController extends Controller
 {
@@ -51,6 +52,6 @@ class BesoinController extends Controller
     public function destroy(Besoin $besoin)
     {
         $besoin->delete();
-        return redirect()->back()->with('info', 'Besoin supprimee');
+        return redirect()->back()->with('info', 'Besoin supprimée');
     }
 }

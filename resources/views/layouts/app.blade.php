@@ -1,6 +1,3 @@
-@php
-    setlocale(LC_ALL, 'fr_FR');
-@endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -32,7 +29,12 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    <img class="w-50" src="{{ asset('assets/images/logo.png') }}" alt="Logo of university of guelma">
+                    <div class="d-block d-sm-none">
+                       <img style="height: 50px" src="{{ asset('assets/images/logo-sm.png') }}" alt="Logo of university of guelma">
+                    </div>
+                    <div class="d-none d-sm-block">
+                        <img class="w-50" src="{{ asset('assets/images/logo.png') }}" alt="Logo of university of guelma">
+                     </div>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
