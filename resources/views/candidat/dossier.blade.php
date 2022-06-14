@@ -1,4 +1,5 @@
 @php
+    //if($errors->any()){dd($errors);}
     $dossier = Illuminate\Support\Facades\DB::table('dossiers')->where('user_id', Auth::id())->first();
     $current_tab = $dossier->current_tab;
 
@@ -259,8 +260,8 @@
                                 <div class="mb-3">
                                     <label for="date de naissance" class="form-label px-2">Photo de la carte<sup class="text-danger"> *</sup></label>
                                     @if (!$dossier->id_card_pic)
-                                        <input @if (!$modification_available) disabled @endif type="file" class="form-control @error('id_card_pic') is-invalid @enderror" name="id_card_pic" id="id_card_pic">
-                                        @error('id_card_pic')
+                                        <input @if (!$modification_available) disabled @endif type="file" class="form-control @error('id_card_picture') is-invalid @enderror" name="id_card_pic" id="id_card_pic">
+                                        @error('id_card_picture')
                                                 <div class="invalid-feedback">
                                                     <strong>{{ $message }}</strong>
                                                 </div>
@@ -410,7 +411,7 @@
                                                 <option selected disabled>Selectionner une choix</option>
                                                 @endif
                                                 <option id="d1" @if ($dossier->diploma_mark=="Honorable") selected @endif value='Honorable' >Honorable</option>
-                                                <option id="d2" @if ($dossier->diploma_mark=="Honorable") selected @endif value='Honorable'>Très honorable</option>
+                                                <option id="d2" @if ($dossier->diploma_mark=="Très Honorable") selected @endif value='Très Honorable'>Très honorable</option>
                                                 <option id="m1" @if ($dossier->diploma_mark=="Assez bien") selected @endif value='Assez bien'>Assez bien</option>
                                                 <option id="m2" @if ($dossier->diploma_mark=="Bien") selected @endif value='Bien'>Bien</option>
                                                 <option id="m3" @if ($dossier->diploma_mark=="Très Bien") selected @endif value='Très Bien'>Très Bien</option>
@@ -484,15 +485,19 @@
                             <div id="magisterCase">
                                     <h5 class="p-3 display-6 mt-3 text-muted text-center">Formations complémentaires</h5>
                                     @if ($modification_available)
-                                    <div class="alert alert-danger text-center fw-bold fs-5">
-                                        En cas de magister seulement <br> Vouz avez le droit d'ajouter 3 formations au maximum
+                                    <div class="alert alert-danger p-5">
+                                        <h5 class="fw-bold">Remarques:</h5>
+                                        <ul>
+                                            <li>Remplir cette partie en cas de magister seulement</li>
+                                            <li>Vouz avez le droit d'ajouter 3 formations au maximum</li>
+                                            <li>Tous les champs sont obligatoires</li>
+                                        </ul>
                                     </div>
                                     <div class="text-center">
                                         @if (App\Models\FormationsComp::where('user_id', $dossier->user_id)->count()<3)
                                           <button type="button" class="btn btn-lg btn-outline-primary border mb-5" data-bs-toggle="modal" data-bs-target="#ajouterFormation">
                                         Ajouter</button>
                                         @endif
-
                                     </div>
 
                                     @endif
@@ -505,7 +510,10 @@
                                                 <th>Numéro</th>
                                                 <th>Institution</th>
                                                 <th>Date d'inscription</th>
+                                                @if ($modification_available)
                                                 <th>Supprimer</th>
+                                                @endif
+
                                             </tr>
                                                 @php
                                                     $j = 1
@@ -517,9 +525,12 @@
                                                     <td>{{ $item->fc_number }}</td>
                                                     <td>{{ $item->fc_institution }}</td>
                                                     <td>{{ $item->fc_inscription_date }}</td>
+                                                    @if ($modification_available)
                                                     <td class="text-center">
-                                                        <button class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                        <a data-bs-toggle="modal" href="#deleteFormation" data-id="{{ $item->id }}" class="open-delete-formation btn btn-outline-danger"><i class="fas fa-trash"></i></a>
                                                     </td>
+                                                    @endif
+
                                                 </tr>
                                                 @endforeach
                                         </tbody>
@@ -553,10 +564,14 @@
                                             <th>Type</th>
                                             <th>Titre</th>
                                             <th>Revue</th>
-                                            <th>Date</th>
-                                            <th>Lien</th>
+                                            <th>Année</th>
+                                            <th>Catégorie</th>
                                             <th>URL</th>
-                                            <th width="10%"></th>
+                                            <th>PDF</th>
+                                            @if ($modification_available)
+                                            <th width="10%">Supprimer</th>
+                                            @endif
+
                                         </tr>
                                     @forelse (Illuminate\Support\Facades\DB::table('articles')
                                     ->where('user_id', $dossier->user_id)->get() as $item)
@@ -578,12 +593,12 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $item->article_date?print(date('d/m/Y', strtotime($item->article_date))):print('-');
+                                                    $item->article_date?print($item->article_date):print('-');
                                                 @endphp
                                             </td>
                                             <td>
                                                 @php
-                                                    $item->article_place?print($item->article_place):print('-');
+                                                    $item->article_category?print($item->article_category):print('-');
                                                 @endphp
                                             </td>
                                             <td>
@@ -591,11 +606,23 @@
                                                     $item->article_link?print($item->article_link):print('-');
                                                 @endphp
                                             </td>
-                                            <td><div class="btn btn-outline-danger">Supprimer</div></td>
+                                            @if ($item->article_file)
+                                                <td style="max-width: 150px;" class="text-truncate">
+                                                <a target="_blank" class="link link-info fw-bold mt-2" href="{{route('getArticle', $item->article_file)}}">{{ $item->article_file }}</a>
+                                                </td>
+                                            @else
+                                                <td>-</td>
+                                            @endif
+                                            @if ($modification_available)
+                                            <td class="text-center">
+                                                <a data-bs-toggle="modal" href="#deleteArticle" data-id="{{ $item->id }}" class="open-delete-article btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                            </td>
+                                            @endif
+
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7">La liste des revues est vide</td>
+                                            <td colspan="8">La liste des revues est vide</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -613,7 +640,10 @@
                                             <th>Titre de conférence</th>
                                             <th>Auteurs de conférence</th>
                                             <th>URL</th>
-                                            <th width="10%"></th>
+                                            <th>Attestation</th>
+                                            @if ($modification_available)
+                                            <th width="10%">Supprimer</th>
+                                            @endif
                                         </tr>
                                     @forelse (Illuminate\Support\Facades\DB::table('conferences')
                                     ->where('user_id', $dossier->user_id)->get() as $item)
@@ -653,11 +683,18 @@
                                                     $item->conference_link?print($item->conference_link):print('-');
                                                 @endphp
                                             </td>
-                                            <td><div class="btn btn-outline-danger">Supprimer</div></td>
+                                            <td style="max-width: 150px;" class="text-truncate">
+                                                <a target="_blank" class="link link-info fw-bold mt-2" href="{{route('getCertificate', $item->certificate)}}">{{ $item->certificate }}</a>
+                                            </td>
+                                            @if ($modification_available)
+                                            <td class="text-center">
+                                                <a data-bs-toggle="modal" href="#deleteConference" data-id="{{ $item->id }}" class="open-delete-conference btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                            </td>
+                                            @endif
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8">La liste des conférences est vide</td>
+                                            <td colspan="9">La liste des conférences est vide</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -692,57 +729,38 @@
                                 <table class="table table-bordered text-center">
                                     <tbody>
                                         <tr>
-                                            <th>Denomiation de l'administration ou de l'insitution (organisme d'emplyeur)</th>
-                                                <th>Fonction ou poste de travail occupe</th>
-                                                <th>Periode</th>
+                                                <th>Dénomiation de l'administration ou de l'insitution (organisme d'emplyeur)</th>
+                                                <th>Fonction ou poste de travail occupé</th>
+                                                <th>Période</th>
                                                 <th>attestation de travail ou contrat</th>
                                                 <th style="max-width: 15vw">motif de la rupture de la relation de travail</th>
-                                                <th></th>
+                                                @if ($modification_available)
+                                                <th>Supprimer</th>
+                                                @endif
                                         </tr>
                                         @forelse (Illuminate\Support\Facades\DB::table('experience_pros')
                                         ->where('user_id', $dossier->user_id)->get() as $item)
                                             <tr>
-                                                <td>
-                                                    @php
-                                                        $item->ep_institution?print($item->ep_institution):print('-');
-                                                    @endphp
-                                                </td>
-                                                <td>
-                                                    @php
-                                                        $item->ep_workplace?print($item->ep_workplace):print('-');
-                                                    @endphp
-                                                </td>
-                                                <td>
-                                                    @php
-                                                        $item->ep_start_date?print(date('d/m/Y', strtotime($item->ep_start_date))."<br>"):print('');
-                                                    @endphp
-                                                    -
-                                                    @php
-                                                        $item->ep_end_date?print("<br>".date('d/m/Y', strtotime($item->ep_end_date))):print('');
-                                                    @endphp
-                                                </td>
-                                                <td>
-                                                    @php
-                                                        $item->ep_work_certificate_ref?print($item->ep_work_certificate_ref."<br>"):print('');
-                                                    @endphp
-                                                    -
-                                                    @php
-                                                        $item->ep_work_certificate_date?print("<br>".date('d/m/Y', strtotime($item->ep_work_certificate_date))):print('');
-                                                    @endphp
-                                                </td>
+                                                <td>{{ $item->ep_institution }}</td>
+                                                <td>{{ $item->ep_workplace }}</td>
+                                                <td>{{ $item->ep_periode }} mois</td>
+                                                <td>{{ $item->ep_work_certificate_ref }} ({{ date('d-m-Y', strtotime($item->ep_work_certificate_date)) }})</td>
+
                                                 <td>
                                                     @php
                                                         $item->ep_mark?print($item->ep_mark):print('-');
                                                     @endphp
                                                 </td>
-                                                <td>
-                                                    <div class="btn btn-outline-danger">Supprimer</div>
+                                                @if ($modification_available)
+                                                <td class="text-center">
+                                                    <a data-bs-toggle="modal" href="#deleteExperience" data-id="{{ $item->id }}" class="open-delete-experience btn btn-outline-danger"><i class="fas fa-trash"></i></a>
                                                 </td>
+                                                @endif
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="8" class="text-center">
-                                                    Vous n'avez ajouté aucune formation complémentaire
+                                                <td colspan="6" class="text-center">
+                                                    Vous n'avez ajouté aucune experience professionnelle
                                                 </td>
                                             </tr>
                                         @endforelse
@@ -759,7 +777,7 @@
                                 <div class="p-4">
                                     <div class="alert alert-warning fw-bold text-center">
                                         <i class="fas fa-exclamation-circle fs-1"></i><br>
-                                        Cette section est destinée uniquement aux candidats qui travaillent maintenant
+                                        Renseignements concerant la situation professionnelle actuelle
                                         <br>
                                         هذا الجزء مخصص للمترشحين العاملين فقط
                                     </div>
@@ -845,6 +863,26 @@
         {{-- Modals --}}
 
         {{-- Les formations complementaire --}}
+        {{--! DELETE --}}
+        <form action="{{ route('delete.formation') }}" method="POST">
+            @csrf
+            <div class="modal fade hide" id="deleteFormation" tabindex="-1" aria-labelledby="deleteFormationLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body p-3">
+                        êtes-vous sûr de vouloir supprimer cette formation?<br>
+                        <input type="hidden" name="id" id="formationId">
+                        <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
+                    </div>
+                    <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
+        {{--! ADD  --}}
         <form action="{{ route('formation.store') }} " method="POST">
             @csrf
             <!-- Modal -->
@@ -856,38 +894,43 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <div class="alert alert-danger text-center">
+                            <strong>vous devez remplir tous les champs obligatoires</strong>
+                        </div>
                     <div class="container px-3 py-3">
                         <div class="row gy-3">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
                             <div class="mb-3">
-                            <label for="Specialité" class="form-label">Specialité</label>
+                            <label for="Specialité" class="form-label">Specialité<sup class="text-danger"> *</sup></label>
                             <input type="text" class="form-control" name="fc_speciality" id="fc_speciality">
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
                             <div class="mb-3">
-                            <label for="Institution" class="form-label">Institution</label>
+                            <label for="Institution" class="form-label">Institution<sup class="text-danger"> *</sup></label>
                             <input type="text" class="form-control" name="fc_institution" id="fc_institution">
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
                             <div class="mb-3">
-                            <label for="Numéro" class="form-label">Numéro</label>
+                            <label for="Numéro" class="form-label">Numéro<sup class="text-danger"> *</sup></label>
                             <input type="text" class="form-control" name="fc_number" id="fc_number">
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
                             <div class="mb-3">
-                            <label for="Date d'inscription" class="form-label">Date d'inscription</label>
+                            <label for="Date d'inscription" class="form-label">Date d'inscription<sup class="text-danger"> *</sup></label>
                             <input type="date" max="{{ now()->subDays(1)->format('Y-m-d') }}" class="form-control" name="fc_inscription_date" id="fc_inscription_date">
                             </div>
                         </div>
                         </div>
                     </div>
                     </div>
-                    <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
+
                     <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <input type="hidden" name="user_id" value="{{ $dossier->user_id }}">
+                    <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
                     <button type="submit" class="btn btn-primary">Ajouter</button>
                     </div>
                 </div>
@@ -896,7 +939,8 @@
         </form>
 
         {{-- Conference --}}
-        <form action="{{ route('conference.store') }} " method="POST">
+        {{--! ADD --}}
+        <form action="{{ route('conference.store') }} " method="POST" enctype="multipart/form-data">
             @csrf
             <!-- Modal -->
             <div class="modal fade" id="ajouterConference" tabindex="-1" aria-labelledby="ajouterConferenceLabel" aria-hidden="true">
@@ -908,10 +952,13 @@
                     </div>
                     <div class="modal-body">
                     <div class="container p-3">
+                        <div class="alert alert-danger text-center">
+                            <strong>vous devez remplir tous les champs obligatoires</strong>
+                        </div>
                         <div class="row g-3">
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
                                 <div class="mb-3">
-                                  <label for="filiere" class="form-label">Nature de conférence</label>
+                                  <label for="filiere" class="form-label">Nature de conférence<sup class="text-danger"> *</sup></label>
                                   <select name="is_international" class="form-select">
                                       <option disabled selected>Selectionner votre choix</option>
                                       <option value="0">Conférence nationale</option>
@@ -923,19 +970,19 @@
                         <div class="row g-3">
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
-                                  <label for="filiere" class="form-label">Conférence</label>
+                                  <label for="filiere" class="form-label">Conférence<sup class="text-danger"> *</sup></label>
                                   <input type="text" class="form-control" name="conference_name">
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
-                                  <label for="filiere" class="form-label">Lieu de conférence</label>
+                                  <label for="filiere" class="form-label">Lieu de conférence<sup class="text-danger"> *</sup></label>
                                   <input type="text" class="form-control" name="conference_place">
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
-                                  <label for="filiere" class="form-label">Date de conférence</label>
+                                  <label for="filiere" class="form-label">Date de conférence<sup class="text-danger"> *</sup></label>
                                   <input name="conference_date" max="{{ now()->format('Y-m-d') }}" type="date" class="form-control" >
                                 </div>
                             </div>
@@ -943,22 +990,29 @@
                         <div class="row g-3">
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
-                                  <label for="filiere" class="form-label">Titre de communication</label>
+                                  <label for="filiere" class="form-label">Titre de communication<sup class="text-danger"> *</sup></label>
                                   <input type="text" class="form-control" name="communication_title">
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
-                                  <label for="filiere" class="form-label">Auteurs de conférence</label>
+                                  <label for="filiere" class="form-label">Auteurs de conférence<sup class="text-danger"> *</sup></label>
                                   <input type="text" class="form-control" name="conference_authors">
                                 </div>
                             </div>
                         </div>
                         <div class="row g-3">
-                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 px-2 py-2">
+                            <div class="col-12 px-2 py-2">
                                 <div class="mb-3">
                                   <label for="filiere" class="form-label">URL</label>
                                   <input type="url" name="conference_link" class="form-control" placeholder="https://www.exemple.com">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 px-2 py-2">
+                                <div class="mb-3">
+                                  <label for="file" class="form-label">Attestation<sup class="text-danger"> *</sup></label>
+                                  <input type="file" name="certificate" class="form-control">
+                                  <small class="text-danger fw-bold">(jpg, jpeg, png, pdf)</small>
                                 </div>
                             </div>
                         </div>
@@ -974,9 +1028,29 @@
                 </div>
             </div>
         </form>
+        {{--! DELETE --}}
+        <form action="{{ route('delete.conference') }}" method="POST">
+            @csrf
+            <div class="modal fade hide" id="deleteConference" tabindex="-1" aria-labelledby="deleteConferenceLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body p-3">
+                        êtes-vous sûr de vouloir supprimer cette conférence?<br>
+                        <input type="hidden" name="id" id="conferenceId">
+                        <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
+                    </div>
+                    <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
 
         {{-- Revue --}}
-        <form action="{{ route('revue.store') }} " method="POST">
+        {{--! ADD --}}
+        <form action="{{ route('revue.store') }} " method="POST" enctype="multipart/form-data">
             @csrf
             <!-- Modal -->
             <div class="modal fade" id="ajouterRevue" tabindex="-1" aria-labelledby="ajouterRevueLabel" aria-hidden="true">
@@ -988,10 +1062,13 @@
                     </div>
                     <div class="modal-body">
                     <div class="container p-3">
+                        <div class="alert alert-danger text-center">
+                            <strong>vous devez remplir tous les champs obligatoires</strong>
+                        </div>
                         <div class="row g-3">
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
                                 <div class="mb-3">
-                                  <label class="form-label">Nature de revue</label>
+                                  <label class="form-label">Nature de revue<sup class="text-danger"> *</sup></label>
                                   <select name="is_international" class="form-select">
                                       <option value="0" selected>Revue nationale</option>
                                       <option value="1">Revue internationale</option>
@@ -1000,7 +1077,7 @@
                             </div>
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
-                                  <label class="form-label">Date de revue (Année)</label>
+                                  <label class="form-label">Date de revue (Année)<sup class="text-danger"> *</sup></label>
                                   <input type="number" min="1980" max="{{ now()->format('Y') }}" value="{{ now()->format('Y') }}" class="form-control" name="article_date">
                                 </div>
                             </div>
@@ -1008,13 +1085,13 @@
                         <div class="row g-3">
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 px-2 py-2">
                                 <div class="mb-3">
-                                  <label class="form-label">Titre (عنوان المقال)</label>
+                                  <label class="form-label">Titre (عنوان المقال)<sup class="text-danger"> *</sup></label>
                                   <input type="text" class="form-control" name="article_title">
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 px-2 py-2">
                                 <div class="mb-3">
-                                  <label class="form-label">Revue (الجريدة)</label>
+                                  <label class="form-label">Revue (الجريدة)<sup class="text-danger"> *</sup></label>
                                   <input type="text" class="form-control" name="article">
                                 </div>
                             </div>
@@ -1038,6 +1115,12 @@
                                   <input type="url" name="article_link" class="form-control" placeholder="https://www.exemple.com">
                                 </div>
                             </div>
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 px-2 py-2">
+                                <div class="mb-3">
+                                  <label class="form-label">Article</label>
+                                  <input type="file" name="article_file" class="form-control">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     </div>
@@ -1046,6 +1129,25 @@
                     <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
                     <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
+        {{--! DELETE --}}
+        <form action="{{ route('delete.article') }}" method="POST">
+            @csrf
+            <div class="modal fade hide" id="deleteArticle" tabindex="-1" aria-labelledby="deleteArticleLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body p-3">
+                        êtes-vous sûr de vouloir supprimer cette article?<br>
+                        <input type="hidden" name="id" id="articleId">
+                        <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
+                    </div>
+                    <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
                     </div>
                 </div>
                 </div>
@@ -1082,6 +1184,7 @@
         </div>
 
           {{-- Les experiences professionnels --}}
+        {{--! ADD --}}
         <form action="{{ route('experience.store') }}" method="POST">
             @csrf
           <!-- Modal -->
@@ -1093,54 +1196,53 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <div class="container px-3 py-3">
+                  <div class="container p-3">
+                      <div class="alert alert-danger text-center">
+                          <strong>vous devez remplir tous les champs obligatoires</strong>
+                      </div>
                     <div class="row gy-3">
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
+                      <div class="col-12 col-lg-6 p-2">
                         <div class="mb-3">
-                          <label for="nom d'institution" class="form-label">Dénomination de l'institution</label>
+                          <label for="nom d'institution" class="form-label">Dénomination de l'institution<sup class="text-danger"> *</sup></label>
                           <input type="text" class="form-control" name="ep_institution" id="ep_institution" aria-describedby="hint1">
                           <small id="hint1" class="form-text text-muted">institution ou administration</small>
                         </div>
                       </div>
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
+                      <div class="col-12 col-lg-6 p-2">
                         <div class="mb-3">
-                          <label for="filiere" class="form-label">Poste de travail occupé</label>
+                          <label for="filiere" class="form-label">Poste de travail occupé<sup class="text-danger"> *</sup></label>
                           <input type="text" class="form-control" name="ep_workplace" id="ep_workplace">
                         </div>
                       </div>
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 pb-2">
+                      <div class="col-12 col-lg-6 p-2">
                         <div class="mb-3">
-                          <label class="form-label">Date de debut</label>
-                          <input type="date" max="{{ now()->subDays(7)->format('Y-m-d') }}" class="form-control" name="ep_start_date" id="ep_start_date">
-                        </div>
-                      </div>
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 pb-2">
-                        <div class="mb-3">
-                          <label class="form-label">Date de fin</label>
-                          <input type="date" max="{{ now()->format('Y-m-d') }}" class="form-control" name="ep_end_date" id="ep_end_date">
-                        </div>
-                      </div>
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
-                        <div class="mb-3">
-                          <label class="form-label">Numéro d'attestation de travail</label>
+                          <label class="form-label">Numéro d'attestation de travail<sup class="text-danger"> *</sup></label>
                           <input type="text" class="form-control" name="ep_work_certificate_ref" id="ep_work_certificate_ref">
                           <small id="hint2" class="form-text text-muted">Attestation ou contrat</small>
                         </div>
                       </div>
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 px-2 py-2">
+                      <div class="col-12 col-lg-6 p-2">
                         <div class="mb-3">
-                          <label class="form-label">Date d'attestation de travail</label>
-                          <input type="date" class="form-control" name="ep_work_certificate_date" id="ep_work_certificate_date">
+                          <label class="form-label">Date d'attestation de travail<sup class="text-danger"> *</sup></label>
+                          <input type="date" max="{{ now()->subMonths(1)->format('Y-m-d') }}" class="form-control" name="ep_work_certificate_date" id="ep_work_certificate_date">
                         </div>
                       </div>
+                      <div class="col-12 col-lg-6 p-2">
+                        <div class="mb-3">
+                          <label class="form-label">Période de travail (nombre de mois)<sup class="text-danger"> *</sup></label>
+                          <input type="number" min="1" value="1" class="form-control" name="ep_periode" id="ep_periode">
+                        </div>
+                      </div>
+
                       <div class="mb-3">
                         <textarea class="form-control" name="ep_mark" id="ep_mark" rows="3" placeholder="Motif de la rupture de la relation de travail"></textarea>
                       </div>
                     </div>
                   </div>
-                </div>
-                <input type="hidden" name="user_id" value="{{ $dossier->user_id }}">
+                  <input type="hidden" name="user_id" value="{{ $dossier->user_id }}">
                 <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
+                </div>
+
                 <div class="modal-footer">
                   <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
                   <button type="submit" name="add_exp" class="btn btn-primary">Ajouter</button>
@@ -1148,6 +1250,25 @@
               </div>
             </div>
           </div>
+        </form>
+        {{--! DELETE --}}
+        <form action="{{ route('delete.experience') }}" method="POST">
+            @csrf
+            <div class="modal fade hide" id="deleteExperience" tabindex="-1" aria-labelledby="deleteExperienceLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body p-3">
+                        êtes-vous sûr de vouloir supprimer cette expérience?<br>
+                        <input type="hidden" name="id" id="experienceId">
+                        <input type="hidden" name="dossier_id" value="{{ $dossier->id }}">
+                    </div>
+                    <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </div>
+                </div>
+                </div>
+            </div>
         </form>
 
         {{-- Validation du dossier --}}
@@ -1211,6 +1332,30 @@
         submit.disabled = !this.checked;
         };
 
+        // Delete formation
+        $(document).on("click", ".open-delete-formation", function () {
+            var formationId = $(this).data('id');
+            $("#formationId").val( formationId );
+            $('#deleteFormation').modal('show');
+        });
+        //Delete Conference
+        $(document).on("click", ".open-delete-conference", function () {
+            var formationId = $(this).data('id');
+            $("#conferenceId").val( formationId );
+            $('#deleteConference').modal('show');
+        });
+        //Delete article
+        $(document).on("click", ".open-delete-article", function () {
+            var formationId = $(this).data('id');
+            $("#articleId").val( formationId );
+            $('#deleteArticle').modal('show');
+        });
+        //Delete article
+        $(document).on("click", ".open-delete-experience", function () {
+            var experienceId = $(this).data('id');
+            $("#experienceId").val( experienceId );
+            $('#deleteExperience').modal('show');
+        });
 
         if(document.getElementById("isMarried").value == "1"){
         document.getElementById("child_col").style.display = 'block';

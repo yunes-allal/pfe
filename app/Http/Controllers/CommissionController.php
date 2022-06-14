@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\CommissionAccount;
 use App\Models\Commission;
+use App\Models\FormationsComp;
 use App\Models\Session;
 use App\Models\Note;
 use App\Models\User;
@@ -23,7 +24,7 @@ class CommissionController extends Controller
         return view('SDP.commissions.index')->with('commissions', Commission::all());
         }
         else{
-            return redirect()->route('index')->with('info', 'Vous n\'avez déclaré aucun besoin');
+            return redirect()->route('home')->with('info', 'Vous n\'avez déclaré aucun besoin');
         }
     }
 
@@ -97,7 +98,7 @@ class CommissionController extends Controller
                 ]);
             }
         }
-        return redirect()->route('commission.mail')->with('info', 'vous devez spécifier la date de début et la date de fin');
+        return redirect()->route('home');
     }
     public function resendAccounts(Request $request)
     {
@@ -122,6 +123,7 @@ class CommissionController extends Controller
             'email' => 'required|email'
         ]);
 
+
         DB::table('commissions')
             ->where('email', '=', $data->email_dep)
             ->update([
@@ -137,24 +139,29 @@ class CommissionController extends Controller
 
     public function getCandidates()
     {
-        if(Session::where('status','conformity')->count()){
-            $commission = Commission::where('email', Auth::user()->email)->select('start_date')->first();
-            if(now() < $commission->start_date){
-                return redirect()->route('home')->with('info', 'Attendez s\'il vous plaît jusqu\'au jour du début de votre processus');
+        if(Session::where('status','inscription')->count() || Session::where('status','conformity')->count()){
+            if(Session::where('status','inscription')->count()){
+                return redirect()->route('home')->with('info', 'Attendez s\'il vous plaît jusqu\'au jour du fin d\'inscription');
             }else{
                 return view('commission.conformite.candidates');
             }
         }else{
             if(Session::where('status','interview')->count()){
                 $commission = Commission::where('email', Auth::user()->email)->select('start_date')->first();
-                if(now() < $commission->start_date){
+                if(now() < $commission->start_date || !$commission->start_date){
                     return redirect()->route('home')->with('info', 'Attendez s\'il vous plaît jusqu\'au jour du début de votre processus');
                 }else{
                     return view('commission.entretien.candidates');
                 }
             }else{
                 if(Session::where('status','sc_works_validation')->count()){
-                    return view('commission.scientifique.candidates');
+                    $commission = Commission::where('email', Auth::user()->email)->select('start_date')->first();
+                    if(now() < $commission->start_date || !$commission->start_date){
+                        return redirect()->route('home')->with('info', 'Attendez s\'il vous plaît jusqu\'au jour du début de votre processus');
+                    }else{
+                        return view('commission.scientifique.candidates');
+                    }
+
                 }
             }
         }
@@ -162,8 +169,38 @@ class CommissionController extends Controller
 
     public function conformed(Request $request)
     {
+        if(Auth::user()->type=='sdp'){
+            DB::table('messages')->where('user_id', $request->user_id)->where('sent_to',Auth::id())->update(['is_replied' => 1]);
+        }
         DB::table('dossiers')->where('user_id', $request->user_id)->update(['is_conformed' => $request->decision]);
         if($request->decision=="1"){
+            //update dossier mark
+            $dossier = DB::table('dossiers')->where('user_id', $request->user_id)->first();
+            $note = 2;
+            // Mention du diplome
+            if($dossier->diploma_mark=="Honorable" || $dossier->diploma_mark=="Bien"){
+                $note = $note+2;
+            }else{
+                if($dossier->diploma_mark=='Très Honorable' || $dossier->diploma_mark=="Très Bien"){
+                    $note = $note+3;
+                }
+            }
+            // Formation complementaire
+            if($dossier->diploma_name=="magister"){
+                $nb_fc = FormationsComp::where('user_id',$request->user_id)->count();
+                if($nb_fc==1){
+                    $note = $note+2;
+                }else{
+                    if($nb_fc==2){
+                        $note = $note+3;
+                    }else{
+                        if($nb_fc==1){
+                            $note = $note+5;
+                        }
+                    }
+                }
+            }
+            DB::table('dossiers')->where('user_id', $request->user_id)->update(['mark'=>$note]);
             Note::create([
                 'dossier_id' => $request->dossier_id,
             ]);
@@ -182,5 +219,34 @@ class CommissionController extends Controller
             ]);
         }
         return redirect()->back();
+    }
+
+
+    public function updateMembers(Request $request)
+    {
+        if(Session::where('status','conformity')->count()){
+            DB::table('commissions')
+            ->where('email', '=', Auth::user()->email)
+            ->update([
+                'conformity_members' => $request->member1.'<br>'.$request->member2.'<br>'.$request->member3,
+            ]);
+        }else{
+            if(Session::where('status','interview')->count()){
+                DB::table('commissions')
+                    ->where('email', '=', Auth::user()->email)
+                    ->update([
+                        'interview_members' => $request->member1.'<br>'.$request->member2.'<br>'.$request->member3,
+                    ]);
+            }else{
+                if(Session::where('status','sc_works_validation')->count()){
+                    DB::table('commissions')
+                    ->where('email', '=', Auth::user()->email)
+                    ->update([
+                        'sc_work_members' => $request->member1.'<br>'.$request->member2.'<br>'.$request->member3,
+                    ]);
+                }
+            }
+        }
+        return back()->with('success', 'Vous pouvez commencer maintenant');
     }
 }

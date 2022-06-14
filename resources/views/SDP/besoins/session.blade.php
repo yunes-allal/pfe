@@ -3,34 +3,59 @@
 @section('content')
     <div class="container my-5">
         <h3>Création d'une nouvelle session</h3>
-        <form class="mt-5 card p-4 rounded-3 shadow-sm" action="{{ route('session') }}" method="post">
+        <form class="mt-5 card p-4 rounded-3 shadow-sm" action="{{ route('session') }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="row gx-5 gy-3 p-4">
                 <div class="col-md-6 col-lg-4">
                     <div class="mb-3">
                         <label for="session" class="form-label fw-bold">Session <sup class="text-danger">*</sup></label>
-                        <input type="month" min="{{ now()->format('Y-m') }}" class="form-control" name="name" id="name">
+                        <input value="{{ old('name') }}" type="month" min="{{ now()->format('Y-m') }}" class="form-control @error('name') is-invalid @enderror" name="name" id="name">
+                        @error('name')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="nombre globale" class="form-label fw-bold">Nombre globale de postes<sup class="text-danger">*</sup></label>
-                        <input type="number" min="1" value="1" class="form-control" name="global_number" id="global_number">
+                        <input type="number" min="1" value="1" class="form-control @error('global_number') is-invalid @enderror" name="global_number" id="global_number">
+                        @error('global_number')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="condition" class="form-label fw-bold">Condition <sup class="text-danger">*</sup></label>
-                        <select class="form-select" name="onlyDoctorat" id="onlyDoctorat">
+                        <select class="form-select @error('decision') is-invalid @enderror" name="onlyDoctorat" id="onlyDoctorat">
                             <option value="false" selected>Doctorat + Magister</option>
                             <option value="true">Doctorat seulement</option>
                         </select>
+                        @error('decision')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <div class="mb-3">
                         <label for="date d'ouverture" class="form-label fw-bold">Date d'ouverture <sup class="text-danger">*</sup></label>
-                        <input onchange="edit()" type="date" min="{{ Carbon\Carbon::now()->format('Y-m-d') }}" class="form-control" name="start_date" id="start_date">
+                        <input value="{{ old('start_date') }}" type="date" min="{{ Carbon\Carbon::now()->addDays(1)->format('Y-m-d') }}" class="@error('start_date') is-invalid @enderror form-control" name="start_date" id="start_date">
+                        @error('start_date')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="date de cloture" class="form-label fw-bold">Période d'inscription (Nombre des jours) <sup class="text-danger">*</sup></label>
-                        <input type="number" min="7" value="7" class="form-control" name="duration" id="duration">
+                        <input type="number" min="15" value="15" class="@error('duration') is-invalid @enderror form-control" name="duration" id="duration">
+                        @error('duration')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -38,15 +63,30 @@
                         <label for="decision" class="form-label fw-bold">Décision d'ouverture</label>
                         <div class="input-group">
                             <input type="text" placeholder="Numero de decision" class="form-control" name="decision" id="decision">
-                            <input type="date" class="form-control" name="decision_date" id="decision_date">
+                            <input value="{{ old('decision_date') }}" type="date" class="form-control @error('decision_date') is-invalid @enderror" name="decision_date" id="decision_date">
+                            @error('decision_date')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                         </div>
                         <div class="input-group mt-2">
                             <input type="text" placeholder="Numero de l'accord" class="form-control" name="agreement" id="agreement">
-                            <input type="date" class="form-control" name="agreement_date" id="agreement_date">
+                            <input value="{{ old('agreement_date') }}" type="date" class="form-control @error('agreement_date') is-invalid @enderror" name="agreement_date" id="agreement_date">
+                            @error('agreement_date')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                         </div>
                     </div>
                     <div class="mb-3">
-                        <input type="file" placeholder="(optionnel)" class="form-control">
+                        <input type="file" name="decision_file" class="form-control @error('decision_file') is-invalid @enderror">
+                        @error('decision_file')
+                            <div class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
                     </div>
                 </div>
             </div>

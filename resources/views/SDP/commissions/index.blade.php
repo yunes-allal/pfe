@@ -1,3 +1,7 @@
+@php
+    $session = App\Models\Session::where('status','!=','off')->first();
+@endphp
+
 @extends('layouts.app')
 
 @section('content')
@@ -10,10 +14,10 @@
         </div>
         <h3 class="fw-bold">L'envoie de les comptes</h3>
         <i class="fw-light">
-            @if (App\Models\Session::where('status','conformity')->count() && App\Models\Dossier::where('is_validated',1)->where('is_conformed', NULL)->count() != 0)
+            @if (App\Models\Session::where('status','conformity')->count() || (App\Models\Session::where('status','inscription')->count()) )
                 ( Etape de validation des dossiers "conformité" )
             @else
-                @if (App\Models\Session::where('status','conformity')->count())
+                @if (App\Models\Session::where('status','interview')->count())
                     ( Etape d'entretien)
                 @else
                     ( Etape de vérification les traveaux scientifiques)
@@ -38,7 +42,7 @@
                     <th width="20%">Nombre des jours</th>
                     <th>
                         Email de destinataire (
-                            @if (App\Models\Session::where('status','interview')->count())
+                            @if (App\Models\Session::where('status','sc_works_validation')->count())
                                 Le CSD
                             @else
                                 Le chef de département
@@ -59,9 +63,17 @@
                         @csrf
                         <tr>
                             <td>{{ $department->name }}</td>
+                            @if ($session->status=='conformity' || $session->status=='inscription')
+                            <td>
+                                {{ date('d-m-Y', strtotime( $session->end_date)) }} <br>(La fin d'inscription)
+                                <input value="{{ $session->end_date }}" type="hidden" name="start_date">
+                            </td>
+                            @else
                             <td>
                                 <input value="{{ old('start_date') }}" type="date" min="{{ now()->format('Y-m-d') }}" class="form-control" name="start_date">
                             </td>
+                            @endif
+
                             <td>
                                 <input type="number" value="1" min="1" class="form-control" name="periode">
                             </td>
@@ -100,8 +112,7 @@
                     <input type="hidden" name="email" value="{{ $item->email }}">
                 </form>
                 @endif
-
-                @endforeach
+            @endforeach
             </tbody>
             </table>
         </div>

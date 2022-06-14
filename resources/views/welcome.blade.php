@@ -38,7 +38,9 @@
                 @auth
                 <a href="{{ route('home') }}"><button class="m-3 btn btn-primary btn-lg"><i class="fas fa-home"></i> Accueil</button></a>
                 @endauth
-                <a class="m-3 btn btn-outline-secondary btn-lg"><i class="fas fa-info-circle"></i> En Savoir Plus</a>
+                @if (0)
+                    <a class="m-3 btn btn-outline-secondary btn-lg"><i class="fas fa-info-circle"></i> En Savoir Plus</a>
+                @endif
             </div>
           </div>
           <div class="col">
@@ -126,11 +128,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               @if (App\Models\Session::count())
-                    <div class="modal-body lh-lg">
-                <div class="text-center fs-6">
+            <div class="modal-body lh-lg">
+                <div class="text-end">
+                    <a target="_blank" href="{{ route('avis') }}" class="btn btn-info">Imprimer</a>
+                </div>
+                <div class="text-center fs-6 fw-bold">
                     République Algérienne Démocratique et Populaire<br>Ministère de l'Enseignement Supérieur et de la Recherche Scientifique<br>Université 08 Mai 1945 Guelma
                 </div>
-                <div class="text-center fst-italic fs-3 text-decoration-underline fw-bold"><h2>Avis de recrutement</h2></div>
+                <div class="text-center fst-italic fs-3 text-decoration-underline fw-bold my-2"><h2>Avis de recrutement</h2></div>
                 <p>L'université du 8 mai 1945 de Guelma lance un avis de recrutement extérne de {{ $session->global_number }} maîtres assistants de classe `B` dans les spécialités suivantes:</p>
                 <table class="table table-bordered">
                     <tbody>
@@ -138,9 +143,9 @@
                             $besoins = Illuminate\Support\Facades\DB::table('besoins')->where('session_id', $session->id)->get();
                         @endphp
                             <tr>
-                                <th>Faculte</th>
-                                <th>Filiere</th>
-                                <th>Specilaite</th>
+                                <th>Faculté</th>
+                                <th>Filière</th>
+                                <th>Spécilaité</th>
                                 <th>Nombre de postes</th>
                             </tr>
                             @foreach ($besoins as $item)
@@ -169,6 +174,7 @@
                                             ({{ $subspeciality->name }})
                                         @endif
                                     </td>
+                                    <td>{{ $item->positions_number }}</td>
                                 </tr>
                             @endforeach
                     </tbody>
@@ -182,10 +188,8 @@
                     <li>L'expérience professionnelle acquise par le candidat ( 0 & 4 points ) .</li>
                     <li>Le résultat de l'entretien avec le jury de sélection ( 0 à 4 points ) .</li>
                 </ul>
-                NB : le départage des candidats déclarés ex - aquo ; s'effectue selon l'ordre de priorité suivant:
-                </div>
+            </div>
               @endif
-
           </div>
         </div>
       </div>

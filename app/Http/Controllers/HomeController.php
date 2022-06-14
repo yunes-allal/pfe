@@ -33,7 +33,7 @@ class HomeController extends Controller
                 return view('SDP.home');
             }else{
                 if(Auth::user()->type == 'commission'){
-                    if(Session::where('status','conformity')->count()){
+                    if(Session::where('status','inscription')->count() || Session::where('status','conformity')->count()){
                       return view('commission.conformite.index');
                     }else{
                         if(Session::where('status','interview')->count()){
@@ -43,6 +43,10 @@ class HomeController extends Controller
                                 return view('commission.scientifique.index');
                             }
                         }
+                    }
+                }else{
+                    if(Auth::user()->type == 'admin'){
+                        return view('admin.home');
                     }
                 }
             }

@@ -10,7 +10,7 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'subject', 'body', 'sent_to'
+        'user_id', 'subject', 'body', 'sent_to','is_replied'
     ];
 
     /**

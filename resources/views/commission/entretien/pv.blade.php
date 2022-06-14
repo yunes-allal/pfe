@@ -42,15 +42,15 @@
                 @foreach ($candidates as $item)
                 @php
                     $i++;
-                    $notes = Illuminate\Support\Facades\DB::table('notes')->where('dossier_id', $item->id)->first();
-                    $sector = Illuminate\Support\Facades\DB::table('besoins')
-                                        ->join('sectors', 'sectors.id','besoins.sector_id')
-                                        ->select('sectors.name')
-                                        ->first();
-                    $speciality = Illuminate\Support\Facades\DB::table('besoins')
-                                        ->join('specialities', 'specialities.id','besoins.speciality_id')
-                                        ->select('specialities.name')
-                                        ->first();
+                     $notes = Illuminate\Support\Facades\DB::table('notes')->where('dossier_id', $item->id)->first();
+                    // $sector = Illuminate\Support\Facades\DB::table('besoins')
+                    //                     ->join('sectors', 'sectors.id','besoins.sector_id')
+                    //                     ->select('sectors.name')
+                    //                     ->first();
+                    // $speciality = Illuminate\Support\Facades\DB::table('besoins')
+                    //                     ->join('specialities', 'specialities.id','besoins.speciality_id')
+                    //                     ->select('specialities.name')
+                    //                     ->first();
                 @endphp
                 <tr>
                     <td>{{ $i }}</td>
@@ -63,8 +63,8 @@
                             ماجيستر
                         @endif
                     </td>
-                    <td>{{ $sector->name }}</td>
-                    <td></td>
+                    <td>{{ $item->diploma_sector }}</td>
+                    <td>{{ $item->diploma_speciality }}</td>
                     <td>{{ $notes->entretien_1 }}</td>
                     <td>{{ $notes->entretien_2 }}</td>
                     <td>{{ $notes->entretien_3 }}</td>

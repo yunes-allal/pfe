@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('subject');
             $table->longText('body');
             $table->unsignedBigInteger('sent_to');
+            $table->boolean('is_replied')->default(0);
             $table->foreign('sent_to')->references('id')->on('users');
             $table->timestamps();
         });

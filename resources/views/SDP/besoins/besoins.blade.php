@@ -30,6 +30,7 @@
         @php
             $session = DB::table('sessions')->select('name','global_number')
                                     ->where('status','=','declaring')
+                                    ->orWhere('status','=','inscription')
                                     ->get();
         @endphp
         @if ($global_number >= $session[0]->global_number)

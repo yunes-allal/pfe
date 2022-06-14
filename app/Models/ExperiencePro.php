@@ -13,8 +13,7 @@ class ExperiencePro extends Model
         'user_id',
         'ep_institution',
         'ep_workplace',
-        'ep_start_date',
-        'ep_end_date',
+        'ep_periode',
         'ep_work_certificate_ref',
         'ep_work_certificate_date',
         'ep_mark'

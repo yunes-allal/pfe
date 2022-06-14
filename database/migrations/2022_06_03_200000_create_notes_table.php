@@ -24,6 +24,7 @@ return new class extends Migration
             $table->float('ts_2')->nullable();
             $table->float('ts_3')->nullable();
             $table->float('ts_4')->nullable();
+            $table->float('ep_mark')->nullable();
             $table->timestamps();
         });
     }

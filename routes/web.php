@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\DownloadFileController;
 use App\Http\Models\Besoin;
+use App\Models\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -8,10 +10,12 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('get-certificate/{filename}', [DownloadFileController::class, 'getCertificate'])->name('getCertificate');
+Route::get('get-article/{filename}', [DownloadFileController::class, 'getArticle'])->name('getArticle');
 
 Route::group(['middleware' => ['update.status']], function() {
 
-    Route::get('/', function (){return view('welcome');});
+    Route::get('/', function (){return view('welcome');})->name('welcome');
 
     Route::get('/inbox', function(){return view('layouts.inbox')->with('user', Auth::id());})->name('inbox');
     Route::post('/send-message', [App\Http\Controllers\MessageController::class, 'store'])->name('send.message');
@@ -56,9 +60,13 @@ Route::group(['middleware' => ['update.status', 'auth', 'candidat']], function()
     Route::get('créer-dossier', [App\Http\Controllers\DossierController::class, 'create'])->name('candidat.create.dossier');
     Route::post('mettre-à-jour-dossier', [App\Http\Controllers\DossierController::class, 'update'])->name('candidat.update.dossier');
     Route::post('dossier/ajouter-expérience-professionnel', [App\Http\Controllers\ExperienceProController::class, 'store'])->name('experience.store');
+    Route::post('dossier/supprimer-experience', [App\Http\Controllers\ExperienceProController::class, 'delete'])->name('delete.experience');
     Route::post('dossier/ajouter-formation-complémentaire', [App\Http\Controllers\FormationsCompController::class, 'store'])->name('formation.store');
+    Route::post('dossier/supprimer-formation', [App\Http\Controllers\FormationsCompController::class, 'delete'])->name('delete.formation');
     Route::post('dossier/ajouter-conférence', [App\Http\Controllers\ConferenceController::class, 'store'])->name('conference.store');
+    Route::post('dossier/supprimer-conférence', [App\Http\Controllers\ConferenceController::class, 'delete'])->name('delete.conference');
     Route::post('dossier/ajouter-revue', [App\Http\Controllers\ArticleController::class, 'store'])->name('revue.store');
+    Route::post('dossier/supprimer-revue', [App\Http\Controllers\ArticleController::class, 'delete'])->name('delete.article');
     Route::post('valider-dossier', [App\Http\Controllers\DossierController::class, 'validateFolder'])->name('validate.dossier');
 });
 
@@ -92,3 +100,31 @@ Route::get('imprimer-pv-entretien', function (){
 //! commissions de validation les traveaux scientifiques
 
 Route::post('noter-traveaux', [App\Http\Controllers\NoteController::class, 'storeTrav'])->name('noter.traveaux');
+
+
+
+Route::post('update-members', [App\Http\Controllers\CommissionController::class, 'updateMembers'])->name('update.members');
+
+Route::get('sdp-define', function(){
+    if(App\Models\User::where('type','sdp')->count()){
+        return redirect()->route('home')->with('fail', 'sdp existe deja');
+    }else{
+        return view('admin.sdp-create');
+    }
+})->name('sdp.define');
+Route::post('create-sdp', [App\Http\Controllers\AdminController::class, 'create'])->name('create.sdp');
+
+
+
+
+Route::post('update-ep-mark', [App\Http\Controllers\NoteController::class, 'storeEP'])->name('update.ep.mark');
+
+
+Route::get('imprimer-avis', function(){
+    if(Session::where('status','!=','off')->count()){
+        return view('avis');
+    }else{
+        return redirect()->route('welcome');
+    }
+
+})->name('avis');

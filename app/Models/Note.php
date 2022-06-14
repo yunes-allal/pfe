@@ -18,7 +18,8 @@ class Note extends Model
         'ts_1',
         'ts_2',
         'ts_3',
-        'ts_4'
+        'ts_4',
+        'ep_mark'
     ];
 
     /**

@@ -33,4 +33,28 @@ class NoteController extends Controller
                             ]);
         return redirect()->back();
     }
+
+    public function storeEP(Request $request)
+    {
+        DB::table('notes')->where('dossier_id', $request->id)
+                            ->update([
+                                'ep_mark' => $request->ep_mark,
+                                'updated_at' => now()
+                            ]);
+        $old_note = DB::table('dossiers')->where('id', $request->id)->first();
+        $notes = DB::table('notes')->where('dossier_id', $request->id)->first();
+        $note = floatval($notes->entretien_1)+floatval($notes->entretien_2)+floatval($notes->entretien_3)+floatval($notes->entretien_4);
+        if((floatval($notes->ts_1)+floatval($notes->ts_2)+floatval($notes->ts_3)+floatval($notes->ts_4)+floatval($request->ep_mark))>2){
+            $note = $note+2;
+        }else{
+            $note = $note+ floatval($notes->ts_1)+floatval($notes->ts_2)+floatval($notes->ts_3)+floatval($notes->ts_4)+floatval($request->ep_mark);
+        }
+
+        $note = $note + floatval($old_note->mark);
+        DB::table('dossiers')->where('id', $request->id)
+                            ->update([
+                                'mark' => $note
+                            ]);
+        return redirect()->back();
+    }
 }

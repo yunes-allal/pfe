@@ -6,11 +6,15 @@
 @section('content')
     <div class="container my-5">
         <div class="text-center">
-            <h6 class="display-5 fw-bold">Bienvenu, {{ Auth::user()->name }}</h6>
+            <h6 class="display-5 fw-bold">Bienvenue, {{ Auth::user()->name }}</h6>
         </div>
         <div class="row g-4 justify-content-evenly m-5">
             @if (!App\Models\Dossier::where('user_id', Auth::id())->exists())
-            <a  style="border-radius: 2rem" style="cursor: pointer" class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-4 card shadow-sm m-2 text-decoration-none" data-bs-toggle="modal" data-bs-target="#submitModal">
+                @if (App\Models\Session::where('status','inscription')->count())
+                <a  style="border-radius: 2rem" style="cursor: pointer" class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-4 card shadow-sm m-2 text-decoration-none" data-bs-toggle="modal" data-bs-target="#submitModal">
+                @else
+                <a href="{{ route('home') }}" class="col-xs-12 col-sm-6 shadow-sm col-md-5 col-lg-4 col-xl-4 card text-decoration-none m-2">
+                @endif
             @else
             <a style="cursor: pointer;border-radius: 2rem" href="{{ route('candidat.dossier') }}" class="col-xs-12 col-sm-6 shadow-sm col-md-5 col-lg-4 col-xl-4 card text-decoration-none m-2">
             @endif
@@ -23,6 +27,7 @@
                 <div class="card-body text-center">
                     <img src="{{ asset('assets/images/Email capture-amico.svg') }}" alt="email-image">
                     <h3 class="display-6 fw-bold">Inbox</h3>
+                        <span class="badge bg-danger rounded-pill p-1">{{ App\Models\Message::where('sent_to',Auth::id())->count() }} messages</span>
                 </div>
             </a>
         </a>
@@ -44,7 +49,6 @@
                                                 </span>
                                             <br>
                                             pour plus de details, <a href="/" class="alert-link link-info">cliquer ici</a>
-                                            <br>vous devez spécifier l'application pour laquelle vous souhaitez postuler
                                         </div>
                     </div>
                 @endif

@@ -18,8 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->string('ep_institution')->nullable();
             $table->string('ep_workplace')->nullable();
-            $table->date('ep_start_date')->nullable();
-            $table->date('ep_end_date')->nullable();
+            $table->integer('ep_periode')->nullable();
             $table->string('ep_work_certificate_ref')->nullable();
             $table->date('ep_work_certificate_date')->nullable();
             $table->longText('ep_mark')->nullable();

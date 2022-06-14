@@ -136,12 +136,6 @@ class DossierController extends Controller
 
     public function validateFolder(Request $request)
     {
-        // Validator::make($request, [
-        //     'id_card' => [
-        //         Rule::unique('dossiers')->ignore($request->id),
-        //     ],
-        // ]);
-
         DB::table('dossiers')->where('id',$request->id)->update([
             'besoin_id' => $request->choix,
             'name' => $request->name,
