@@ -10,6 +10,14 @@ class Commission extends Model
     use HasFactory;
 
     protected $fillable = [
-        'department_id', 'email', 'password', 'sent_to'
+        'department_id',
+        'email',
+        'password',
+        'start_date',
+        'end_date',
+        'sent_to',
+        'conformity_members',
+        'interview_members',
+        'sc_work_members',
     ];
 }

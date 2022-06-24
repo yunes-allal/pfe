@@ -20,7 +20,7 @@
                         <input type="hidden" name="id" value="{{ $item->id }}">
                         <tr>
                             <th width="50%">{{ $item->name }}</th>
-                            <td width="40%"><input name="pts" class="form-control" type="number" step="0.25" min="0.5" value="{{ $item->pts }}"></td>
+                            <td width="40%"><input name="pts" class="form-control" type="number" step="0.25" min="0.25" value="{{ $item->pts }}"></td>
                             <td class="text-center">
                                 <button type="submit" class="btn btn-outline-warning">
                                     <i class="fas fa-edit"></i>

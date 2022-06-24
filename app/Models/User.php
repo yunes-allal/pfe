@@ -43,13 +43,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public static function search($search){
-        return empty($search) ? static::query()->where('type', '=', 'candidat')
-            : static::query()->where('type', '=', 'candidat')
-                ->where('name','like','%'.$search.'%')
-                ->orWhere('email','like','%'.$search.'%');
-    }
-
     /**
      * Get the user associated with the Dossier
      *
@@ -58,5 +51,15 @@ class User extends Authenticatable
     public function dossier()
     {
         return $this->hasOne(Dossier::class);
+    }
+
+    /**
+     * Get all of the messages for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
     }
 }

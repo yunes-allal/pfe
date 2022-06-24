@@ -10,23 +10,23 @@ class Conference extends Model
     use HasFactory;
 
     protected $fillable = [
-        'dossier_id',
+        'user_id',
         'is_international',
         'conference_name',
         'conference_place',
         'conference_date',
-        'conference_title',
+        'communication_title',
         'conference_authors',
         'conference_link'
     ];
 
     /**
-     * Get the dossier that owns the Conference
+     * Get the user that owns the Conference
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function dossier()
+    public function user()
     {
-        return $this->belongsTo(Dossier::class);
+        return $this->belongsTo(User::class);
     }
 }

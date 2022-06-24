@@ -20,8 +20,8 @@ class Dossier extends Model
     }
 
     protected $fillable = [
-    'session_id', 'user_id', 'status', 'is_conformed', 'current_tab', 'besoin_id' , 'name', 'family_name', 'name_ar', 'family_name_ar', 'father_name', 'mother_family_name', 'mother_name',
-    'birth_date', 'birthplace', 'isMan', 'nationality', 'id_card', 'isMarried', 'children_number',
+    'session_id', 'user_id', 'is_validated', 'is_conformed', 'current_tab', 'besoin_id' , 'user_picture', 'name', 'family_name', 'name_ar', 'family_name_ar', 'father_name', 'mother_family_name', 'mother_name',
+    'birth_date', 'birthplace', 'isMan', 'nationality', 'id_card', 'id_card_pic', 'isMarried', 'children_number',
     'disability_type', 'commune', 'wilaya', 'adresse', 'tel', 'national_service', 'doc_num', 'doc_issued_date',
     'diploma_name', 'diploma_mark', 'diploma_sector', 'diploma_speciality', 'diploma_date', 'diploma_number', 'diploma_start_date', 'diploma_end_date', 'diploma_institution', 'sp_workplace', 'sp_first_nomination_date', 'sp_nomination_date','sp_category', 'sp_echelon', 'sp_agreement_ref', 'sp_agreement_date', 'sp_authority', 'sp_adresse', 'sp_tel', 'sp_fax', 'sp_email',
     ];
@@ -53,7 +53,7 @@ class Dossier extends Model
      */
     public function conferences()
     {
-        return $this->hasMany(Conference::class, 'foreign_key', 'local_key');
+        return $this->hasMany(Conference::class);
     }
 
     /**
@@ -74,6 +74,12 @@ class Dossier extends Model
     public function note()
     {
         return $this->hasOne(Note::class);
+    }
+
+    public static function search($search){
+        return empty($search) ? static::query()
+            : static::query()->where('family_name','like','%'.$search.'%')
+                ->orWhere('diploma_speciality','like','%'.$search.'%');
     }
 }
 

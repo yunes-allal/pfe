@@ -9,22 +9,22 @@ class Article extends Model
 {
     use HasFactory;
      protected $fillable = [
-        'dossier_id',
+        'user_id',
         'is_international',
         'article_title',
         'article',
         'article_date',
-        'article_place',
+        'article_category',
         'article_link'
      ];
 
      /**
-      * Get the dossier that owns the Article
+      * Get the user that owns the Article
       *
       * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
       */
-     public function dossier()
+     public function user()
      {
-         return $this->belongsTo(Dossier::class, 'foreign_key', 'other_key');
+         return $this->belongsTo(User::class);
      }
 }

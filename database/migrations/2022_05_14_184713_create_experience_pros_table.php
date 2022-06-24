@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('experience_pros', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dossier_id')->constrained();
+            $table->foreignId('user_id')->constrained();
             $table->string('ep_institution')->nullable();
             $table->string('ep_workplace')->nullable();
             $table->date('ep_start_date')->nullable();

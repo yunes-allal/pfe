@@ -1,5 +1,24 @@
 @php
     $session = Illuminate\Support\Facades\DB::table('sessions')->where('status','!=','off')->first();
+
+    function getFaculty($id)
+    {
+        return DB::table('faculties')->select('name', 'abbr')->where('id', $id)->first();
+    }
+
+    function getSector($id)
+    {
+        return DB::table('sectors')->select('name')->where('id', $id)->first();
+    }
+
+    function getSpeciality($id)
+    {
+        return DB::table('specialities')->select('name')->where('id', $id)->first();
+    }
+    function getSubspeciality($id)
+    {
+        return DB::table('subspecialities')->select('name')->where('id', $id)->first();
+    }
 @endphp
 
 @extends('layouts.app')
@@ -9,8 +28,9 @@
       <div class="container my-3">
         <div class="row align-items-center" style="background-image: url({{ asset('assets/images/cool-background.svg') }})">
           <div class="col-md-6 col-sm-12">
-            <h1 class="display-5">Plateforme de recrutement pour l'université de 8 mai 1945 Guelma</h1>
-            <h1 class="mt-2 lead lh-base">Cette plateforme est destinée aux maître assistants de classe B</p>
+            <h1 class="display-5 fw-bold">Plateforme de recrutement externe</h1>
+            <h1 class="mt-2 lead fw-bold lh-base">pour les maîtres assistants de classe B</p>
+            <i class="text-muted">-université de 8 mai 1945 Guelma-</i>
             <div class="mt-4 mb-2 text-center">
                 @guest
                    <a href="{{ route('login') }}"><button class="m-3 btn btn-primary btn-lg"><i class="fas fa-sign-in-alt"></i> Se Connecter</button></a>
@@ -114,11 +134,43 @@
                 <p>L'université du 8 mai 1945 de Guelma lance un avis de recrutement extérne de {{ $session->global_number }} maîtres assistants de classe `B` dans les spécialités suivantes:</p>
                 <table class="table table-bordered">
                     <tbody>
+                        @php
+                            $besoins = Illuminate\Support\Facades\DB::table('besoins')->where('session_id', $session->id)->get();
+                        @endphp
                             <tr>
-                                <td>Lorem ipsum dolor sit.</td>
-                                <td>Unde, corporis similique. Libero.</td>
-                                <td>Optio impedit tenetur illum?</td>
+                                <th>Faculte</th>
+                                <th>Filiere</th>
+                                <th>Specilaite</th>
+                                <th>Nombre de postes</th>
                             </tr>
+                            @foreach ($besoins as $item)
+                                @php
+                                    $faculty = getFaculty($item->faculty_id);
+                                    $sector = getSector($item->sector_id);
+                                    $speciality = 0;
+                                    $subspeciality = 0;
+                                    if($item->speciality_id){
+                                        $speciality = getSpeciality($item->speciality_id);
+                                    }
+                                    if($item->subspeciality_id){
+                                    $subspeciality = getSubspeciality($item->subspeciality_id);
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>{{ $faculty->name }}</td>
+                                    <td>{{ $sector->name }}</td>
+                                    <td>
+                                        @if ($speciality)
+                                            {{ $speciality->name }}
+                                        @else
+                                            Tous les specialités
+                                        @endif
+                                        @if ($subspeciality)
+                                            ({{ $subspeciality->name }})
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                     </tbody>
 
                 </table>

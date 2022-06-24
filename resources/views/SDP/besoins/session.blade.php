@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <div class="mb-3">
-                        <label for="decision" class="form-label fw-bold">Décision d'ouverture <sup class="text-danger">*</sup></label>
+                        <label for="decision" class="form-label fw-bold">Décision d'ouverture</label>
                         <div class="input-group">
                             <input type="text" placeholder="Numero de decision" class="form-control" name="decision" id="decision">
                             <input type="date" class="form-control" name="decision_date" id="decision_date">

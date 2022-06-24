@@ -11,18 +11,15 @@ class FormationsCompController extends Controller
     public function store(Request $data)
     {
         FormationsComp::create([
-            'dossier_id' => $data->dossier_id,
-            'fc_diploma' => $data->fc_diploma,
-            'fc_field' => $data->fc_field,
-            'fc_major' => $data->fc_major,
-            'fc_origin' => $data->fc_origin,
-            'fc_diploma_ref' => $data->fc_diploma_ref,
-            'fc_diploma_date' => $data->fc_diploma_date,
-            'fc_start_date' => $data->fc_start_date,
-            'fc_end_date' => $data->fc_end_date,
-            'fc_phd_register_date' => $data->fc_phd_register_date,
+            'user_id' => $data->user_id,
+            'fc_speciality' => $data->fc_speciality,
+            'fc_institution' => $data->fc_institution,
+            'fc_number' => $data->fc_number,
+            'fc_inscription_date' => $data->fc_inscription_date,
+            'created_at' =>now(),
+            'updated_at' => now()
         ]);
-        DB::table('dossiers')->where('id', $data->dossier_id)->update(['current_tab' => '3']);
+        DB::table('dossiers')->where('id', $data->dossier_id)->update(['current_tab' => '2']);
         return back()->with('success', 'Nouvelle formation complémentaire ajoutée avec succès');
     }
 }

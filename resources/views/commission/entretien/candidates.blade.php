@@ -1,5 +1,5 @@
 @php
-$session = Illuminate\Support\Facades\DB::table('sessions')->where('on_going','true')->select('id')->first();
+$session = Illuminate\Support\Facades\DB::table('sessions')->where('status','!=','off')->select('id')->first();
 $candidates = DB::select('SELECT dossiers.* FROM `besoins`, `commissions`, `dossiers` WHERE dossiers.besoin_id = besoins.id AND commissions.department_id = besoins.department_id AND commissions.email = "'.Auth::user()->email.'" AND dossiers.is_conformed=1 AND '.$session->id.'= dossiers.session_id');
 @endphp
 
@@ -8,18 +8,20 @@ $candidates = DB::select('SELECT dossiers.* FROM `besoins`, `commissions`, `doss
 
 @section('content')
 <div class="container">
-    <div class="display-3">Liste des candidat</div>
+    <div class="display-3">Liste des candidats</div>
+    <span class="fw-bold">(Etape d'entretien)</span>
     <div class="inline-block text-end px-4 mx-4">
             <a target="_blank" class="btn btn-info" href="{{ route('pv.entretien') }}">
                 <i class="fas fa-print"></i> Générer PV
             </a>
     </div>
     <div class="table-responsive-md border p-4 m-4">
-        <table class="table table-bordered text-center">
+        <span class="fw-bold text-danger">Remarque: </span><i class="text-muted">Cliquer sur le nom pour visualiser le dossier</i>
+        <table class="table table-bordered text-center mt-2">
             <tbody>
                 <tr>
-                    <th>Nom et prenom</th>
-                    <th width="33%">Application</th>
+                    <th>Nom et prénom</th>
+                    <th width="33%">spécialité</th>
                     @php
                         $global = DB::table('criteres')->where('type', 'entretien')->sum('pts');
                     @endphp
@@ -30,19 +32,19 @@ $candidates = DB::select('SELECT dossiers.* FROM `besoins`, `commissions`, `doss
                         <td class="fw-bold link-info" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#Dossier{{ $item->id }}">
                             {{ $item->family_name.' '.$item->name }}
                         </td>
-                        <td>{{ $item->besoin_id }}</td>
+                        <td>{{ $item->diploma_speciality }}</td>
                         <td>
                             @if (App\Models\Note::where('dossier_id', $item->id))
                                     @php
                                         $notes = DB::table('notes')->where('dossier_id', $item->id)->first();
                                     @endphp
-                                    @if ($notes)
+                                    @if ($notes->entretien_1)
                                     {{ $notes->entretien_1+$notes->entretien_2+$notes->entretien_3+$notes->entretien_4 }}
                                     @else
-                                    <button class="btn btn-info" data-bs-target="#Entretien{{ $item->id }}" data-bs-toggle="modal">Noter</button>
+                                    <button class="btn btn-success text-white fw-bold" data-bs-target="#Entretien{{ $item->id }}" data-bs-toggle="modal">Noter</button>
                                     @endif
                             @endif
-                        </td>
+                            </td>
                     </tr>
 
 
@@ -90,7 +92,7 @@ $candidates = DB::select('SELECT dossiers.* FROM `besoins`, `commissions`, `doss
                                 </div>
                             </div>
                             <div class="modal-footer border-top-0">
-                                <button class="btn btn-light fw-bold" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Annuler</button>
                                 <button type="submit" class="btn btn-outline-danger fw-bold">Confirmer</button>
                                 </form>
                             </div>

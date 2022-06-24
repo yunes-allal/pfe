@@ -10,7 +10,7 @@ class ExperiencePro extends Model
     use HasFactory;
 
     protected $fillable = [
-        'dossier_id',
+        'user_id',
         'ep_institution',
         'ep_workplace',
         'ep_start_date',
@@ -21,12 +21,12 @@ class ExperiencePro extends Model
     ];
 
     /**
-     * Get the dossier that owns the ExperiencePro
+     * Get the user that owns the ExperiencePro
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function dossier()
+    public function user()
     {
-        return $this->belongsTo(Dossier::class);
+        return $this->belongsTo(User::class);
     }
 }

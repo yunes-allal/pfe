@@ -10,16 +10,22 @@ class FormationsComp extends Model
     use HasFactory;
 
     protected $fillable = [
-        'dossier_id', 'fc_diploma', 'fc_field', 'fc_major', 'fc_origin', 'fc_diploma_ref', 'fc_diploma_date', 'fc_start_date', 'fc_end_date', 'fc_phd_register_date',
+        'user_id',
+        'fc_speciality',
+        'fc_institution',
+        'fc_number',
+        'fc_inscription_date',
+        'created_at',
+        'updated_at'
     ];
 
     /**
-     * Get the dossier that owns the FormationsComp
+     * Get the user that owns the FormationsComp
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function dossier()
+    public function user()
     {
-        return $this->belongsTo(Dossier::class);
+        return $this->belongsTo(User::class);
     }
 }

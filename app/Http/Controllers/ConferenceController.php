@@ -13,12 +13,12 @@ class ConferenceController extends Controller
     public function store(Request $data)
     {
         Conference::create([
-            'dossier_id' => $data->dossier_id,
+            'user_id' => $data->user_id,
             'is_international' => $data->is_international,
             'conference_name' => $data->conference_name,
             'conference_place' => $data->conference_place,
             'conference_date' => $data->conference_date,
-            'conference_title' => $data->conference_title,
+            'communication_title' => $data->communication_title,
             'conference_authors' => $data->conference_authors,
             'conference_link' => $data->conference_link
         ]);

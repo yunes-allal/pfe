@@ -5,21 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Globalcriterias extends Model
+class Message extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name', 'pts', 'session_id'
+        'user_id', 'subject', 'body', 'sent_to'
     ];
 
     /**
-     * Get the session that owns the Globalcriterias
+     * Get the user that owns the Message
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function session()
+    public function user()
     {
-        return $this->belongsTo(Session::class);
+        return $this->belongsTo(User::class);
     }
 }

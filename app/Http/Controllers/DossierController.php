@@ -7,6 +7,8 @@ use App\Models\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class DossierController extends Controller
 {
@@ -26,7 +28,6 @@ class DossierController extends Controller
                 'session_id' => $session[0]->id,
                 'current_tab' => 1,
                 'user_id'=> Auth::id(),
-                'status'=> 'not_validated',
                 'isMan' => 0,
                 'nationality' => 'Algerienne',
                 'isMarried' => 0
@@ -38,6 +39,49 @@ class DossierController extends Controller
 
     public function update(Request $request)
     {
+        if($request->user_picture && Dossier::where('user_id',Auth::id())->where('user_picture',NULL)){
+            $fileNameToStore = NULL;
+            $request->validate([
+            'user_picture' => 'image|nullable|max:2048|dimensions:min_width=132,min_height=170,max_width=133,max_height=171'
+            ]);
+            if($request->hasFile('user_picture')){
+                //Get file name with extension
+                $fileNameWithExt = $request->file('user_picture')->getClientOriginalName();
+                //Get just file name
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                //Get just extension
+                $extension = $request->file('user_picture')->getClientOriginalExtension();
+                // filename to store
+                $fileNameToStore = $filename.'_'.time().'.'.$extension;
+                // upload image
+                $path = $request->file('user_picture')->storeAs('public/users_pictures', $fileNameToStore);
+            }
+            // store image to db
+            DB::table('dossiers')->where('id',$request->id)->update(['user_picture' => $fileNameToStore]);
+        }
+
+        if($request->id_card_pic && Dossier::where('user_id',Auth::id())->where('id_card_pic',NULL)){
+            $fileNameToStore = NULL;
+            $request->validate([
+            'id_card_pic' => 'image|nullable|max:2048'
+            ]);
+            if($request->hasFile('id_card_pic')){
+                //Get file name with extension
+                $fileNameWithExt = $request->file('id_card_pic')->getClientOriginalName();
+                //Get just file name
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                //Get just extension
+                $extension = $request->file('id_card_pic')->getClientOriginalExtension();
+                // filename to store
+                $fileNameToStore = $filename.'_'.time().'.'.$extension;
+                // upload image
+                $path = $request->file('id_card_pic')->storeAs('public/id_cards', $fileNameToStore);
+            }
+            // store image to db
+            DB::table('dossiers')->where('id',$request->id)->update(['id_card_pic' => $fileNameToStore]);
+        }
+
+
         DB::table('dossiers')->where('id',$request->id)
                             ->update([
                                 'besoin_id' => $request->besoin_id,
@@ -85,7 +129,58 @@ class DossierController extends Controller
                                 'sp_tel' => $request->sp_tel,
                                 'sp_fax' => $request->sp_fax,
                                 'sp_email' => $request->sp_email,
+                                'updated_at' => now()
                             ]);
         return back()->with('info', 'Mis à jour avec succés');
+    }
+
+    public function validateFolder(Request $request)
+    {
+        // Validator::make($request, [
+        //     'id_card' => [
+        //         Rule::unique('dossiers')->ignore($request->id),
+        //     ],
+        // ]);
+
+        DB::table('dossiers')->where('id',$request->id)->update([
+            'besoin_id' => $request->choix,
+            'name' => $request->name,
+            'family_name' => $request->family_name,
+            'name_ar' => $request->name_ar,
+            'family_name_ar' => $request->family_name_ar,
+            'birth_date' => $request->birth_date,
+            'birthplace' => $request->birthplace,
+            'id_card' => $request->id_card,
+            'id_card_pic' => $request->id_card_picture,
+            'nationality' => $request->nationality,
+            'adresse' => $request->adresse,
+            'tel' => $request->tel,
+            'diploma_name' => $request->diplome,
+            'diploma_mark' => $request->mention,
+            'diploma_sector' => $request->filiere,
+            'diploma_speciality' => $request->specialite,
+            'updated_at' => now()
+        ]);
+        $request->validate([
+            'choix' => 'required',
+            'name' => 'required',
+            'family_name' => 'required',
+            'name_ar' => 'required',
+            'family_name_ar' => 'required',
+            'birth_date' => 'required',
+            'birthplace' => 'required',
+            'id_card' => 'required',
+            'id_card_picture' =>'required',
+            'nationality' => 'required',
+            'adresse' => 'required',
+            'tel' => 'required',
+            'diplome' => 'required',
+            'mention' => 'required',
+            'filiere' => 'required',
+            'specialite' => 'required'
+        ]);
+
+        DB::table('dossiers')->where('id',$request->id)->update(['is_validated'=>1, 'current_tab'=>1]);
+        return redirect()->route('home')->with('success', 'votre dossier a été soumis avec succès');
     }
 }

@@ -18,7 +18,12 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained();
             $table->string('email');
             $table->string('password');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->string('sent_to')->nullable();
+            $table->string('conformity_members')->nullable();
+            $table->string('interview_members')->nullable();
+            $table->string('sc_work_members')->nullable();
             $table->timestamps();
         });
     }

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('dossiers', function (Blueprint $table) {
             // Folder informations
             $table->id();
-            $table->string('status');
+            $table->boolean('is_validated')->default(0);
             $table->string('is_conformed')->nullable();
             $table->string('current_tab')->default(1);
 
@@ -28,6 +28,7 @@ return new class extends Migration
             //files
 
             // personal informations of the candidate
+            $table->string('user_picture')->nullable();
             $table->string('name')->nullable();
             $table->string('family_name')->nullable();
             $table->string('name_ar')->nullable();
@@ -40,6 +41,7 @@ return new class extends Migration
             $table->boolean('isMan')->nullable();
             $table->string('nationality')->nullable();
             $table->string('id_card')->nullable();
+            $table->string('id_card_pic')->nullable();
             $table->boolean('isMarried')->nullable();
             $table->integer('children_number')->nullable();
             $table->string('disability_type')->nullable();
@@ -76,7 +78,7 @@ return new class extends Migration
             $table->string('sp_fax')->nullable();
             $table->string('sp_email')->nullable();
 
-
+            $table->float('mark')->default(0);
             $table->timestamps();
         });
     }

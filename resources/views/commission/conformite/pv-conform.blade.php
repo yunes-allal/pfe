@@ -48,7 +48,7 @@
                 </tr>
                 @endforeach
             </tbody>
-        </table>
+            </table>
         </div>
         <div class="fw-bold text-start fs-6">
            <div>حرر بقالمة في : {{ now()->format('Y/m/d') }}</div>

@@ -55,7 +55,7 @@
                 <tr>
                     <td>{{ $i }}</td>
                     <td>{{ $item->user_id }}</td>
-                    <td>{{ $item->family_name.' '.$item->name }}</td>
+                    <td>{{ $item->family_name_ar.' '.$item->name_ar }}</td>
                     <td>
                         @if ($item->diploma_name=='doctorat')
                             دوكتوراه
@@ -64,7 +64,7 @@
                         @endif
                     </td>
                     <td>{{ $sector->name }}</td>
-                    <td>{{ $speciality->name }}</td>
+                    <td></td>
                     <td>{{ $notes->entretien_1 }}</td>
                     <td>{{ $notes->entretien_2 }}</td>
                     <td>{{ $notes->entretien_3 }}</td>

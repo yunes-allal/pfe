@@ -15,16 +15,11 @@ return new class extends Migration
     {
         Schema::create('formations_comps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dossier_id')->constrained();
-            $table->string('fc_diploma')->nullable();
-            $table->string('fc_field')->nullable();
-            $table->string('fc_major')->nullable();
-            $table->string('fc_origin')->nullable();
-            $table->string('fc_diploma_ref')->nullable();
-            $table->date('fc_diploma_date')->nullable();
-            $table->date('fc_start_date')->nullable();
-            $table->date('fc_end_date')->nullable();
-            $table->date('fc_phd_register_date')->nullable();
+            $table->foreignId('user_id')->constrained();
+            $table->string("fc_speciality")->nullable();
+            $table->string("fc_institution")->nullable();
+            $table->string("fc_number")->nullable();
+            $table->date("fc_inscription_date")->nullable();
             $table->timestamps();
         });
     }

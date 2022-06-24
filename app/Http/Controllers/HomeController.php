@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Session;
 
 class HomeController extends Controller
 {
@@ -15,6 +16,7 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('update.status');
     }
 
     /**
@@ -28,10 +30,20 @@ class HomeController extends Controller
             return view('candidat.index');
         }else{
             if(Auth::user()->type == 'sdp'){
-                return view('SDP.index');
+                return view('SDP.home');
             }else{
                 if(Auth::user()->type == 'commission'){
-                    return view('commission.conformite.index');
+                    if(Session::where('status','conformity')->count()){
+                      return view('commission.conformite.index');
+                    }else{
+                        if(Session::where('status','interview')->count()){
+                            return view('commission.entretien.index');
+                        }else{
+                            if(Session::where('status','sc_works_validation')->count()){
+                                return view('commission.scientifique.index');
+                            }
+                        }
+                    }
                 }
             }
         }
